@@ -141,7 +141,11 @@ export class ServiceWorkerManager {
         timestamp
       });
       
-      await transaction.done;
+      // Wait for transaction to complete
+      await new Promise<void>((resolve, reject) => {
+        transaction.oncomplete = () => resolve();
+        transaction.onerror = () => reject(transaction.error);
+      });
     } catch (error) {
       console.error('Failed to store scheduled notification:', error);
     }
@@ -158,7 +162,7 @@ export class ServiceWorkerManager {
       request.onsuccess = () => resolve(request.result);
       
       request.onupgradeneeded = (event) => {
-        const db = request.result;
+        const db = (event.target as any).result;
         if (!db.objectStoreNames.contains('notifications')) {
           const store = db.createObjectStore('notifications', { keyPath: 'id' });
           store.createIndex('timestamp', 'timestamp', { unique: false });
@@ -201,7 +205,11 @@ export class ServiceWorkerManager {
       const store = transaction.objectStore('notifications');
       
       store.delete(id);
-      await transaction.done;
+      // Wait for transaction to complete
+      await new Promise<void>((resolve, reject) => {
+        transaction.oncomplete = () => resolve();
+        transaction.onerror = () => reject(transaction.error);
+      });
     } catch (error) {
       console.error('Failed to cancel notification:', error);
     }

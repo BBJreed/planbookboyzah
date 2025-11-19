@@ -1,11 +1,9 @@
-import React, { useState, useEffect, useRef, memo, useMemo } from 'react';
+import React, { useState, useEffect, useRef, memo } from 'react';
 import { CalendarEvent, TaskItem, DecorativeElement } from '../types';
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, startOfWeek, endOfWeek } from 'date-fns';
 import RealtimeSyncService from '../services/realtimeSync';
 import { biometricAuth } from '../services/biometricAuth';
 import { voiceInputService } from '../services/voiceInput';
-import { cameraService } from '../services/cameraService';
-import { locationService } from '../services/locationService';
 import { darkModeService } from '../services/darkModeService';
 import { enhancedNotificationService } from '../services/enhancedNotifications';
 import { geofencingService } from '../services/geofencingService';
@@ -63,9 +61,9 @@ const MobileApp: React.FC = memo(() => {
   const [realtimeSync] = useState(new RealtimeSyncService('http://localhost:3001', 'sample-token'));
   const [showCamera, setShowCamera] = useState(false);
   const [capturedImage, setCapturedImage] = useState<string | null>(null);
-  const [showLocationButton, setShowLocationButton] = useState(true);
+  const [showLocationButton] = useState(true);
   const [isListening, setIsListening] = useState(false);
-  const [voiceCommand, setVoiceCommand] = useState('');
+
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [isOledMode, setIsOledMode] = useState(false);
   const [notificationsEnabled, setNotificationsEnabled] = useState(false);
@@ -258,27 +256,10 @@ const MobileApp: React.FC = memo(() => {
     setIsAuthenticated(false);
   };
 
-  const addEvent = (event: CalendarEvent) => {
-    const updatedEvents = [...state.events, event];
-    setState(prev => ({ ...prev, events: updatedEvents }));
-    localStorage.setItem('events', JSON.stringify(updatedEvents));
-  };
-
-  const addTask = (task: TaskItem) => {
-    const updatedTasks = [...state.tasks, task];
-    setState(prev => ({ ...prev, tasks: updatedTasks }));
-    localStorage.setItem('tasks', JSON.stringify(updatedTasks));
-  };
-
   const addSticker = (sticker: DecorativeElement) => {
     const updatedStickers = [...state.stickers, sticker];
     setState(prev => ({ ...prev, stickers: updatedStickers }));
     localStorage.setItem('stickers', JSON.stringify(updatedStickers));
-  };
-
-  // Handle pull to refresh
-  const handleRefresh = () => {
-    syncWithServer();
   };
 
   const checkNotificationPermissions = async () => {
@@ -304,7 +285,8 @@ const MobileApp: React.FC = memo(() => {
 
     voiceInputService.startListening(
       (text: string) => {
-        setVoiceCommand(text);
+        // Voice command recognized
+        console.log('Voice command:', text);
         setIsListening(false);
         
         // Parse the voice command for event creation
@@ -644,7 +626,7 @@ const MobileApp: React.FC = memo(() => {
                       
                       {/* Calendar days */}
                       <div className="calendar-grid-book">
-                        {generateCalendarDays().map((day, index) => {
+                        {generateCalendarDays().map((day, _index) => {
                           const dayEvents = getEventsForDay(day);
                           const dayTasks = getTasksForDay(day);
                           const dayDecorations = getDecorationsForDay(day);
@@ -661,7 +643,7 @@ const MobileApp: React.FC = memo(() => {
                                 {format(day, 'd')}
                               </div>
                               <div className="day-indicators-book">
-                                {dayDecorations.slice(0, 1).map((decoration, idx) => (
+                                {dayDecorations.slice(0, 1).map((decoration, _idx) => (
                                   <div 
                                     key={decoration.id} 
                                     className="decoration-indicator-book"

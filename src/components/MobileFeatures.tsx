@@ -6,18 +6,17 @@ interface MobileFeaturesProps {
   onRefresh: () => void;
 }
 
-const MobileFeatures: React.FC<MobileFeaturesProps> = ({ isOnline, isMobile, onRefresh }) => {
-  const [isOffline, setIsOffline] = useState(!isOnline);
+const MobileFeatures: React.FC<MobileFeaturesProps> = ({ isOnline, isMobile }) => {
+
   const [showOfflineBanner, setShowOfflineBanner] = useState(false);
-  const [pullToRefreshActive, setPullToRefreshActive] = useState(false);
-  const [touchStartY, setTouchStartY] = useState(0);
+  const [pullToRefreshActive] = useState(false);
+
   const [isListening, setIsListening] = useState(false);
-  const [voiceCommand, setVoiceCommand] = useState('');
+
   const [showVoiceButton, setShowVoiceButton] = useState(true);
   const recognitionRef = useRef<any>(null);
 
   useEffect(() => {
-    setIsOffline(!isOnline);
     if (!isOnline) {
       setShowOfflineBanner(true);
       setTimeout(() => setShowOfflineBanner(false), 5000);
@@ -35,7 +34,6 @@ const MobileFeatures: React.FC<MobileFeaturesProps> = ({ isOnline, isMobile, onR
 
       recognitionRef.current.onresult = (event: any) => {
         const transcript = event.results[0][0].transcript;
-        setVoiceCommand(transcript);
         setIsListening(false);
         handleVoiceCommand(transcript);
       };
@@ -78,32 +76,6 @@ const MobileFeatures: React.FC<MobileFeaturesProps> = ({ isOnline, isMobile, onR
       recognitionRef.current.stop();
       setIsListening(false);
     }
-  };
-
-  // Handle pull to refresh
-  const handleTouchStart = (e: React.TouchEvent) => {
-    if (window.scrollY === 0) {
-      setTouchStartY(e.touches[0].clientY);
-    }
-  };
-
-  const handleTouchMove = (e: React.TouchEvent) => {
-    if (window.scrollY === 0 && touchStartY > 0) {
-      const touchY = e.touches[0].clientY;
-      const touchDelta = touchY - touchStartY;
-
-      if (touchDelta > 50) {
-        setPullToRefreshActive(true);
-      }
-    }
-  };
-
-  const handleTouchEnd = () => {
-    if (pullToRefreshActive) {
-      onRefresh();
-    }
-    setPullToRefreshActive(false);
-    setTouchStartY(0);
   };
 
   if (!isMobile) return null;

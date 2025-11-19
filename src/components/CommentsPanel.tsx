@@ -87,7 +87,7 @@ export const CommentsPanel: React.FC<CommentsPanelProps> = ({
         marginBottom: 15 
       }}>
         <h3 style={{ margin: 0 }}>
-          Comments on {entityType}: {entity ? (entityType === 'event' ? entity.title : entity.content) : 'Unknown'}
+          Comments on {entityType}: {entity ? (entityType === 'event' ? (entity as any).title : (entity as any).content) : 'Unknown'}
         </h3>
         <button 
           onClick={onClose}

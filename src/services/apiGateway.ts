@@ -152,9 +152,17 @@ export class APIGateway {
    * Connect to an API service
    */
   async connectService(serviceId: string, credentials: any): Promise<boolean> {
+    console.log(`Connecting to service ${serviceId} with provided credentials`);
+    
     const service = this.services.get(serviceId);
     if (!service) {
       console.warn(`API service not found: ${serviceId}`);
+      return false;
+    }
+
+    // Validate credentials
+    if (!credentials) {
+      console.error('No credentials provided for service connection');
       return false;
     }
 

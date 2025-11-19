@@ -95,11 +95,11 @@ export class AuditLog {
     }
 
     if (options?.startDate) {
-      filteredLogs = filteredLogs.filter(log => log.timestamp >= options.startDate);
+      filteredLogs = filteredLogs.filter(log => log.timestamp >= options.startDate!);
     }
 
     if (options?.endDate) {
-      filteredLogs = filteredLogs.filter(log => log.timestamp <= options.endDate);
+      filteredLogs = filteredLogs.filter(log => log.timestamp <= options.endDate!);
     }
 
     if (options?.limit) {
@@ -267,7 +267,7 @@ export class AuditLog {
    * Check for suspicious activity
    */
   checkForSuspiciousActivity(userId?: string): AuditLogEntry[] {
-    const since = new Date(Date.now() - 60 * 60 * 1000); // Last hour
+
     
     // Look for patterns that might indicate suspicious activity:
     // 1. Multiple failed login attempts

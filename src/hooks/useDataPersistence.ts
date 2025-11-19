@@ -76,7 +76,7 @@ export const useDataPersistence = <T>(
     encryptionKey = '',
     syncWithServer = false,
     syncEndpoint = '',
-    syncInterval = 30000 // 30 seconds
+
   } = options;
   
   const [data, setData] = useState<T>(initialValue);
@@ -357,7 +357,7 @@ const openDB = (): Promise<IDBDatabase> => {
     request.onsuccess = () => resolve(request.result);
     
     request.onupgradeneeded = (event) => {
-      const db = request.result;
+      const db = (event.target as any).result;
       if (!db.objectStoreNames.contains(STORE_NAME)) {
         db.createObjectStore(STORE_NAME, { keyPath: 'key' });
       }

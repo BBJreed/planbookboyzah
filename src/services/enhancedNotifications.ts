@@ -52,7 +52,6 @@ export class EnhancedNotificationService {
         await registration.showNotification(title, {
           icon: '/icons/icon-192x192.png',
           badge: '/icons/icon-192x192.png',
-          timestamp: Date.now(),
           ...options
         });
       } else {
@@ -80,11 +79,14 @@ export class EnhancedNotificationService {
       body,
       icon: '/icons/icon-192x192.png',
       badge: '/icons/icon-192x192.png',
-      actions,
-      timestamp: Date.now(),
       requireInteraction: true,
       ...options
     };
+    
+    // Log actions for future implementation
+    if (actions.length > 0) {
+      console.log('Notification actions:', actions);
+    }
 
     await this.showNotification(title, notificationOptions);
   }

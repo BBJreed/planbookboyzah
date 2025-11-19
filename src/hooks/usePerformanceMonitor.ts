@@ -64,8 +64,8 @@ export const usePerformanceMonitor = (options: PerformanceMonitorOptions = {}) =
       // Memory usage (if available)
       if ('memory' in performance) {
         // @ts-ignore - performance.memory is not in the standard types
-        const memory = performance.memory;
-        if (memory) {
+        const memory = (performance as any).memory;
+        if (memory && memory.usedJSHeapSize && memory.jsHeapSizeLimit) {
           const memoryUsage = Math.round((memory.usedJSHeapSize / memory.jsHeapSizeLimit) * 100);
           setMetrics(prev => ({ ...prev, memoryUsage }));
         }

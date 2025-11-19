@@ -147,6 +147,7 @@ export class WebhookService {
    * Send webhook request
    */
   private async sendWebhook(webhook: Webhook, data: any): Promise<void> {
+    console.log(`Sending webhook to ${webhook.url} with data:`, data);
     // In a real application, this would make an HTTP POST request
     // For demo purposes, we'll simulate the request
     

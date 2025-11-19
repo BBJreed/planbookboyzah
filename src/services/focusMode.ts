@@ -6,7 +6,7 @@
 export class FocusMode {
   private static instance: FocusMode;
   private isActive: boolean = false;
-  private originalStyles: string = '';
+
   private focusElements: Set<string> = new Set();
   private blocklist: Set<string> = new Set([
     '.social-media',
@@ -36,8 +36,6 @@ export class FocusMode {
     this.isActive = true;
     
     // Store original styles
-    this.originalStyles = this.getDocumentStyles();
-    
     // Apply focus mode styles
     this.applyFocusModeStyles();
     
@@ -302,23 +300,6 @@ export class FocusMode {
     
     const focusedElements = document.querySelectorAll('.focus-mode-focused');
     focusedElements.forEach(el => el.classList.remove('focus-mode-focused'));
-  }
-
-  /**
-   * Get document styles
-   */
-  private getDocumentStyles(): string {
-    return Array.from(document.styleSheets)
-      .map(sheet => {
-        try {
-          return Array.from(sheet.cssRules || [])
-            .map(rule => rule.cssText)
-            .join('\n');
-        } catch (e) {
-          return '';
-        }
-      })
-      .join('\n');
   }
 
   /**

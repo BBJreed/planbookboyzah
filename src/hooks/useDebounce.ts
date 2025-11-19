@@ -16,7 +16,7 @@ export const useDebounce = <T>(
   const maxTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const lastCallTimeRef = useRef<number | null>(null);
   const lastInvokeTimeRef = useRef<number>(0);
-  const leadingValueRef = useRef<T | null>(null);
+
 
   const { leading = false, trailing = true, maxWait } = options;
 

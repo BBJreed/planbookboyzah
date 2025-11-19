@@ -286,7 +286,7 @@ export const useCamera = (options: CameraOptions = {}) => {
     stopCamera();
     
     // Switch facing mode
-    const newFacingMode = facingMode === 'user' ? 'environment' : 'user';
+
     
     // Restart camera with new facing mode
     setTimeout(() => {

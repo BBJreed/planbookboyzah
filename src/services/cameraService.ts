@@ -6,7 +6,7 @@
 export class CameraService {
   private static instance: CameraService;
   private videoStream: MediaStream | null = null;
-  private qrScanner: any = null;
+
 
   private constructor() {
     // Initialize QR scanner if available
@@ -96,6 +96,8 @@ export class CameraService {
    * Scan QR code from video stream
    */
   async scanQRCode(videoElement: HTMLVideoElement): Promise<string | null> {
+    console.log('Scanning QR code from video element:', videoElement.videoWidth, 'x', videoElement.videoHeight);
+    
     // In a real app, this would use a QR scanning library
     // For demo purposes, we'll simulate a successful scan
     return new Promise((resolve) => {

@@ -9,7 +9,6 @@ interface CollaborationCursorProps {
 }
 
 export const CollaborationCursor: React.FC<CollaborationCursorProps> = ({ 
-  userId, 
   username, 
   x, 
   y, 

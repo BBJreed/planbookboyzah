@@ -69,7 +69,7 @@ export class EmailIntegrationService {
    * Generate email template for event invitations
    */
   static generateEventInvitationEmail(event: CalendarEvent, attendees: string[]): string {
-    const icsContent = this.generateICSContent(event, attendees);
+
     
     return `
 Subject: Invitation: ${event.title} - ${event.startTime.toLocaleDateString()}
@@ -89,31 +89,6 @@ ${attendees.map(email => `- ${email}`).join('\n')}
 
 --
 This invitation was sent from Artful Agenda
-    `.trim();
-  }
-  
-  /**
-   * Generate ICS (iCalendar) content for event
-   */
-  private static generateICSContent(event: CalendarEvent, attendees: string[]): string {
-    const formatDate = (date: Date) => {
-      return date.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
-    };
-    
-    return `
-BEGIN:VCALENDAR
-VERSION:2.0
-PRODID:-//Artful Agenda//EN
-BEGIN:VEVENT
-UID:${event.id}@artfulagenda.com
-DTSTART:${formatDate(event.startTime)}
-DTEND:${formatDate(event.endTime)}
-SUMMARY:${event.title}
-DESCRIPTION:${event.description || ''}
-LOCATION:
-${attendees.map(email => `ATTENDEE:mailto:${email}`).join('\n')}
-END:VEVENT
-END:VCALENDAR
     `.trim();
   }
   

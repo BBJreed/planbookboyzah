@@ -1,6 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useStore } from '../stores/appStore';
-import { CalendarEvent, TaskItem } from '../types';
 
 export const AnalyticsDashboard: React.FC = () => {
   const { events, tasks } = useStore();

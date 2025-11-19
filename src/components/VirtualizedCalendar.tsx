@@ -1,6 +1,6 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { useStore } from '../stores/appStore';
-import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, startOfWeek, endOfWeek } from 'date-fns';
+import { startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, startOfWeek, endOfWeek } from 'date-fns';
 
 interface VirtualizedCalendarProps {
   width: number;
@@ -14,7 +14,6 @@ export const VirtualizedCalendar: React.FC<VirtualizedCalendarProps> = ({ width,
     handwriting,
     tasks,
     visibility,
-    currentTheme,
     selectedDate,
     zoomLevel,
     viewMode
@@ -70,7 +69,7 @@ export const VirtualizedCalendar: React.FC<VirtualizedCalendarProps> = ({ width,
   const days = generateCalendarDays();
 
   // Only render visible days
-  const visibleDays = days.slice(visibleRange.start, visibleRange.end);
+
 
   const dateToPosition = (dateString: string): { x: number, y: number } => {
     const targetDate = new Date(dateString);

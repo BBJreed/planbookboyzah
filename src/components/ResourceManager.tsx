@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { rbac, User } from '../services/rbac';
+import { rbac } from '../services/rbac';
 
 interface Resource {
   id: string;
@@ -74,7 +74,7 @@ const ResourceManager: React.FC = () => {
     purpose: ''
   });
 
-  const [currentUser, setCurrentUser] = useState<User | null>(null);
+
 
   const handleAddResource = () => {
     if (!newResource.name) return;
@@ -135,10 +135,6 @@ const ResourceManager: React.FC = () => {
 
   const getAvailableResources = () => {
     return resources.filter(resource => resource.status === 'available');
-  };
-
-  const getUserBookings = (userId: string) => {
-    return bookings.filter(booking => booking.userId === userId);
   };
 
   const getResourceById = (resourceId: string) => {

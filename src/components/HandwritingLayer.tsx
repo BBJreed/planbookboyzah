@@ -10,7 +10,6 @@ interface HandwritingLayerProps {
 
 export const HandwritingLayer: React.FC<HandwritingLayerProps> = ({ 
   handwriting, 
-  cellDimensions, 
   dateToPosition, 
   visibility 
 }) => {

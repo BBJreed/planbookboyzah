@@ -69,18 +69,19 @@ export const useOnlineStatus = (maxRetries: number = 3, retryDelay: number = 500
     }
 
     connectionCheckRef.current = new AbortController();
-    const { signal } = connectionCheckRef.current;
+
 
     try {
       // Try to fetch a small resource to verify connectivity
-      const response = await fetch('https://httpbin.org/get', {
-        method: 'HEAD',
-        signal,
-        cache: 'no-store',
-        timeout: 5000
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 5000);
+      
+      const response = await fetch('https://www.google.com/favicon.ico', {
+        method: 'GET',
+        signal: controller.signal
       });
       
-      return response.ok;
+      clearTimeout(timeoutId);      return response.ok;
     } catch (error) {
       // If it's an abort error, rethrow it
       if ((error as any).name === 'AbortError') {

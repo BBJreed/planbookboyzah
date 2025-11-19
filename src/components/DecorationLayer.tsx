@@ -12,7 +12,6 @@ interface DecorationLayerProps {
 
 export const DecorationLayer: React.FC<DecorationLayerProps> = ({ 
   decorations, 
-  cellDimensions, 
   dateToPosition, 
   visibility,
   startDraggingSticker,

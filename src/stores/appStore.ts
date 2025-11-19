@@ -1,6 +1,5 @@
 import { create } from 'zustand';
 import { LayerState, CalendarEvent, DecorativeElement, HandwritingStroke, TaskItem, VisualTheme, SyncOperation } from '../types';
-import { useHistory } from '../hooks/useHistory';
 
 interface AppState extends LayerState {
   currentTheme: VisualTheme | null;

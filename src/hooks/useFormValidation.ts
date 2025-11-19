@@ -141,7 +141,7 @@ export const useFormValidation = (fields: Record<string, FieldConfig>) => {
   // Real-time validation when fields change
   useEffect(() => {
     const newErrors: Record<string, string> = {};
-    let hasErrors = false;
+
 
     Object.keys(fields).forEach(fieldName => {
       // Only validate fields that have been touched
@@ -151,7 +151,6 @@ export const useFormValidation = (fields: Record<string, FieldConfig>) => {
         
         if (errorMessage) {
           newErrors[fieldName] = errorMessage;
-          hasErrors = true;
         }
       }
     });

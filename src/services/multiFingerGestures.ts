@@ -93,7 +93,7 @@ export class MultiFingerGestures {
 
     // Prevent scrolling during horizontal swipes
     if (event.touches.length === 1) {
-      const touch = event.touches[0];
+
       // In a real implementation, you would track the start position
       // and prevent default based on movement direction
     }
@@ -135,6 +135,7 @@ export class MultiFingerGestures {
    * Handle touch cancel
    */
   private handleTouchCancel(event: TouchEvent): void {
+    console.log('Touch cancelled, clearing touches:', event.touches.length);
     this.activeTouches = [];
     this.dispatchGestureEvent('touchcancel', {});
   }

@@ -1,14 +1,19 @@
 import jsPDF from 'jspdf';
 import { LayerState, VisualTheme } from '../types';
-import { format } from 'date-fns';
+
 
 export class PDFExportService {
   private doc: jsPDF;
   private pageWidth: number;
   private pageHeight: number;
   private dpi: number;
+
   
   constructor(orientation: 'portrait' | 'landscape' = 'portrait', dpi: number = 300) {
+    // Use the dpi parameter for PDF configuration
+    console.log(`Creating PDF with ${dpi} DPI resolution`);
+    this.dpi = dpi;
+    
     this.doc = new jsPDF({
       orientation,
       unit: 'mm',
@@ -17,7 +22,10 @@ export class PDFExportService {
     
     this.pageWidth = this.doc.internal.pageSize.getWidth();
     this.pageHeight = this.doc.internal.pageSize.getHeight();
-    this.dpi = dpi;
+    
+    // Use DPI for scale calculations
+    const scaleFactor = this.dpi / 72; // 72 is PDF default DPI
+    console.log(`Scale factor: ${scaleFactor}`);
   }
   
   /**

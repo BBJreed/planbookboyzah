@@ -49,14 +49,18 @@ export const useSecurity = (options: SecurityOptions = {}) => {
       try {
         // Check for WebAuthn support
         const available = !!(window.PublicKeyCredential);
-        setState(prev => ({ ...prev, isBiometricAvailable: available }));
+        setState(prev => ({ 
+          ...prev, 
+          isBiometricAvailable: available,
+          securityLevel: requireBiometric && available ? 'high' : 'medium'
+        }));
       } catch (error) {
         console.warn('Biometric authentication not available:', error);
       }
     };
 
     checkBiometricAvailability();
-  }, []);
+  }, [requireBiometric]);
 
   // Check lockout status
   useEffect(() => {
@@ -234,6 +238,7 @@ export const useSecurity = (options: SecurityOptions = {}) => {
     try {
       // In a real implementation, this would send a code to the phone number
       // For demonstration, we'll simulate 2FA setup
+      console.debug('Setting up 2FA for phone:', phoneNumber);
       setState(prev => ({ ...prev, isTwoFactorEnabled: true }));
       return true;
     } catch (error) {
@@ -274,6 +279,7 @@ export const useSecurity = (options: SecurityOptions = {}) => {
     try {
       // In a real implementation, this would call a password change API
       // For demonstration, we'll simulate password change
+      console.debug('Changing password, new length:', newPassword.length);
       if (oldPassword === 'password') {
         // Password changed successfully
         return true;

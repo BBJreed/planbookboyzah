@@ -1,6 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { AIScheduler } from '../services/aiScheduler';
-import { CalendarEvent, TaskItem } from '../types';
 
 interface Message {
   id: string;

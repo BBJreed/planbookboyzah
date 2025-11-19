@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import { useState, useCallback, useMemo, useRef } from 'react';
 
 interface VirtualizationOptions<T> {
   items: T[];

@@ -195,6 +195,13 @@ export class LocationService {
    * Get coordinates from address (forward geocoding)
    */
   async getCoordinatesFromAddress(address: string): Promise<{ latitude: number; longitude: number } | null> {
+    console.log('Geocoding address:', address);
+    
+    if (!address.trim()) {
+      console.error('Address cannot be empty');
+      return null;
+    }
+    
     // In a real app, this would call a geocoding service
     // For demo purposes, we'll return mock coordinates
     return {

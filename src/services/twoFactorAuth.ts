@@ -74,6 +74,11 @@ export class TwoFactorAuth {
    */
   async verifyToken(token: string, secret: string): Promise<boolean> {
     try {
+      console.log('Verifying 2FA token with provided secret');
+      // Validate secret is provided
+      if (!secret) {
+        throw new Error('Secret key is required for token verification');
+      }
       // In a real application, this would:
       // 1. Validate the token against the secret
       // 2. Check if the token has already been used

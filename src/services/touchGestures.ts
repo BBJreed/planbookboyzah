@@ -9,13 +9,15 @@ export class TouchGestures {
   private touchStartY: number = 0;
   private touchEndX: number = 0;
   private touchEndY: number = 0;
+  private activeTouches: Touch[] = [];
   private minSwipeDistance: number = 50;
   private touchStartTime: number = 0;
   private touchEndTime: number = 0;
   private longPressThreshold: number = 500; // milliseconds
-  private multiTouchStartTime: number = 0;
+
   private multiTouchStartDistance: number = 0;
-  private activeTouches: Touch[] = [];
+  private multiTouchStartTime: number = 0;
+
 
   private constructor() {
     this.initializeTouchEvents();
@@ -43,6 +45,7 @@ export class TouchGestures {
    */
   private handleTouchStart(event: TouchEvent): void {
     this.activeTouches = Array.from(event.touches);
+    console.log('Touch start, active touches:', this.activeTouches.length);
     const touch = event.touches[0];
     this.touchStartX = touch.clientX;
     this.touchStartY = touch.clientY;
@@ -51,6 +54,7 @@ export class TouchGestures {
     // Handle multi-touch
     if (event.touches.length === 2) {
       this.multiTouchStartTime = Date.now();
+      console.log('Multi-touch gesture started at:', this.multiTouchStartTime);
       const touch1 = event.touches[0];
       const touch2 = event.touches[1];
       this.multiTouchStartDistance = Math.sqrt(
@@ -112,6 +116,7 @@ export class TouchGestures {
    * Handle touch cancel
    */
   private handleTouchCancel(event: TouchEvent): void {
+    console.log('Touch cancelled for', event.touches.length, 'touches');
     this.activeTouches = [];
     // Reset all touch tracking
     this.touchStartX = 0;
@@ -205,19 +210,6 @@ export class TouchGestures {
   }
 
   /**
-   * Dispatch double tap event
-   */
-  private dispatchDoubleTapEvent(): void {
-    const event = new CustomEvent('doubletap', {
-      detail: {
-        x: this.touchEndX,
-        y: this.touchEndY
-      }
-    });
-    document.dispatchEvent(event);
-  }
-
-  /**
    * Add swipe listener
    */
   addSwipeListener(callback: (direction: string) => void): void {
@@ -269,6 +261,7 @@ export class TouchGestures {
    * Remove swipe listener
    */
   removeSwipeListener(callback: (direction: string) => void): void {
+    console.log('Removing swipe listener:', callback.name || 'anonymous function');
     // This would require storing the handler reference
     // For simplicity, we're not implementing this in the demo
   }

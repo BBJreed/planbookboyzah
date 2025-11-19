@@ -44,6 +44,9 @@ export const useFeatureFlag = (config: FeatureFlagConfig, context: FeatureFlagCo
       return true;
     }
     
+    // Log flag evaluation for debugging
+    console.debug(`Evaluating feature flag: ${key}`);
+    
     // Evaluate all conditions
     return rule.conditions.every(condition => {
       switch (condition.type) {

@@ -123,10 +123,10 @@ export const useTheme = (options: ThemeOptions = {}) => {
     availableThemes: DEFAULT_THEMES,
     isDarkMode: false,
     isOledMode: false,
-    isHighContrast: false,
-    isColorBlindMode: false,
+    isHighContrast: enableHighContrast,
+    isColorBlindMode: enableColorBlindMode,
     fontSize: 'medium',
-    animationLevel: 'full'
+    animationLevel: enableDynamicThemes ? 'full' : 'reduced'
   });
   
   // Load theme from localStorage or system preference

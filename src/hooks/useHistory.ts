@@ -230,12 +230,6 @@ export const useHistory = <T extends LayerState>(
   }, [historyState]);
   
   // Clean up debounce timer on unmount
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const cleanup = useCallback(() => {
-    if (debounceTimerRef.current) {
-      clearTimeout(debounceTimerRef.current);
-    }
-  }, []);
   
   return {
     // Current state

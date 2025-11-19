@@ -23,6 +23,7 @@ export type Permission =
   | 'reports:view'
   | 'reports:export'
   | 'settings:view'
+  | 'settings:create'
   | 'settings:edit'
   | 'users:invite'
   | 'users:remove'
@@ -251,7 +252,11 @@ export class RBAC {
    * Check if user can perform an action on a resource
    */
   can(userId: string, action: 'view' | 'create' | 'edit' | 'delete', resource: 'calendar' | 'tasks' | 'stickers' | 'workflow' | 'reports' | 'settings' | 'users'): boolean {
-    const permission: Permission = `${resource}:${action}`;
+    // Special handling for delete action on settings (not supported)
+    if (resource === 'settings' && action === 'delete') {
+      return false;
+    }
+    const permission = `${resource}:${action}` as any;
     return this.hasPermission(userId, permission);
   }
 }
