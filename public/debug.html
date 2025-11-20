@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Working Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; background: #f0f0f0; }
+        .container { max-width: 600px; margin: 0 auto; background: white; padding: 30px; border-radius: 10px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>✅ HTML is Working!</h1>
+        <p>If you can see this, basic deployment works.</p>
+        <p>Current time: <span id="time"></span></p>
+        <button onclick="testJS()">Test JavaScript</button>
+        <div id="result"></div>
+    </div>
+    
+    <script>
+        function testJS() {
+            document.getElementById('result').innerHTML = '<p style="color: green;">✅ JavaScript is working too!</p>';
+        }
+        
+        // Show current time
+        document.getElementById('time').textContent = new Date().toLocaleString();
+    </script>
+</body>
+</html>
