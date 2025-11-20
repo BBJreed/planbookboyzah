@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useStore } from './stores/appStore';
 import { CalendarCanvas } from './components/CalendarCanvas';
-import { StickerToolbar } from './components/StickerToolbar';
+import { StickerToolbar } from './components/EnhancedStickerToolbar';
 import { SearchBar } from './components/SearchBar';
 import { DatePicker } from './components/DatePicker';
 import { ErrorBoundary } from './components/ErrorBoundary';
@@ -117,27 +117,54 @@ const App: React.FC = () => {
         </header>
         
         <main className="app-main">
-          <div className="sidebar">
-            <nav className="main-nav">
-              <ul>
-                <li><a href="#calendar">Calendar</a></li>
-                <li><a href="#analytics">Analytics</a></li>
-                <li><a href="#tasks">Tasks</a></li>
-                <li><a href="#habits">Habits</a></li>
-                <li><a href="#goals">Goals</a></li>
-              </ul>
-            </nav>
-          </div>
-          
-          <div className="main-content">
-            <CalendarCanvas
-              width={window.innerWidth * 0.6}
-              height={window.innerHeight * 0.7}
-            />
-          </div>
-          
-          <div className="right-sidebar">
-            <button onClick={() => setShowStickerToolbar(true)}>Add Sticker</button>
+          {/* Book Container with Binding */}
+          <div className="planner-book">
+            <div className="book-binding">
+              <div className="binding-rings">
+                <div className="ring"></div>
+                <div className="ring"></div>
+                <div className="ring"></div>
+                <div className="ring"></div>
+                <div className="ring"></div>
+                <div className="ring"></div>
+              </div>
+            </div>
+            
+            {/* Left Page */}
+            <div className="page left-page">
+              <div className="page-content">
+                <div className="page-header">
+                  <h2>{selectedDate.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}</h2>
+                </div>
+                <CalendarCanvas
+                  width={window.innerWidth * 0.35}
+                  height={window.innerHeight * 0.65}
+                />
+              </div>
+            </div>
+            
+            {/* Right Page */}
+            <div className="page right-page">
+              <div className="page-content">
+                <div className="page-header">
+                  <h2>Notes & Tasks</h2>
+                  <button 
+                    className="sticker-btn"
+                    onClick={() => setShowStickerToolbar(true)}
+                    title="Add Stickers & Photos"
+                  >
+                    🎨
+                  </button>
+                </div>
+                <div className="notes-section">
+                  <div className="ruled-lines">
+                    {Array.from({ length: 20 }, (_, i) => (
+                      <div key={i} className="ruled-line"></div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </main>
         
