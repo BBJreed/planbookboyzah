@@ -1,13 +1,14 @@
 import React, { useState, useEffect, useRef, memo } from 'react';
 import { CalendarEvent, TaskItem, DecorativeElement } from '../types';
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, startOfWeek, endOfWeek } from 'date-fns';
-import RealtimeSyncService from '../services/realtimeSync';
+// import RealtimeSyncService from '../services/realtimeSync'; // Disabled to prevent connection errors
 import { biometricAuth } from '../services/biometricAuth';
 import { voiceInputService } from '../services/voiceInput';
 import { darkModeService } from '../services/darkModeService';
 import { enhancedNotificationService } from '../services/enhancedNotifications';
 import { geofencingService } from '../services/geofencingService';
 import MultiFingerGestures from './MultiFingerGestures';
+import AnalyticsDashboard from './AnalyticsDashboard';
 
 interface MobileAppState {
   events: CalendarEvent[];
@@ -58,11 +59,14 @@ const MobileApp: React.FC = memo(() => {
   const [activeTab, setActiveTab] = useState<ActiveTab>('events');
   
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [realtimeSync] = useState(new RealtimeSyncService('http://localhost:3001', 'sample-token'));
+  // Disabled localhost connection to prevent ERR_CONNECTION_REFUSED errors
+  // const [realtimeSync] = useState(new RealtimeSyncService('http://localhost:3001', 'sample-token'));
   const [showCamera, setShowCamera] = useState(false);
   const [capturedImage, setCapturedImage] = useState<string | null>(null);
   const [showLocationButton] = useState(true);
   const [isListening, setIsListening] = useState(false);
+  const [showAnalytics, setShowAnalytics] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
 
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [isOledMode, setIsOledMode] = useState(false);
@@ -457,6 +461,92 @@ const MobileApp: React.FC = memo(() => {
           <div className="camera-controls">
             <button onClick={captureImage}>📸</button>
             <button onClick={stopCamera}>❌</button>
+          </div>
+        </div>
+      )}
+
+      {/* Analytics Modal */}
+      {showAnalytics && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <div className="modal-header">
+              <h2>📊 Analytics Dashboard</h2>
+              <button 
+                className="close-button"
+                onClick={() => setShowAnalytics(false)}
+              >
+                ❌
+              </button>
+            </div>
+            <div className="modal-body">
+              <AnalyticsDashboard />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Settings Modal */}
+      {showSettings && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <div className="modal-header">
+              <h2>⚙️ Settings</h2>
+              <button 
+                className="close-button"
+                onClick={() => setShowSettings(false)}
+              >
+                ❌
+              </button>
+            </div>
+            <div className="modal-body">
+              <div className="settings-section">
+                <h3>Display</h3>
+                <div className="setting-item">
+                  <label>
+                    <input
+                      type="checkbox"
+                      checked={isDarkMode}
+                      onChange={(e) => setIsDarkMode(e.target.checked)}
+                    />
+                    Dark Mode
+                  </label>
+                </div>
+                <div className="setting-item">
+                  <label>
+                    <input
+                      type="checkbox"
+                      checked={isOledMode}
+                      onChange={(e) => setIsOledMode(e.target.checked)}
+                    />
+                    OLED Mode
+                  </label>
+                </div>
+              </div>
+              
+              <div className="settings-section">
+                <h3>Notifications</h3>
+                <div className="setting-item">
+                  <label>
+                    <input
+                      type="checkbox"
+                      checked={notificationsEnabled}
+                      onChange={(e) => setNotificationsEnabled(e.target.checked)}
+                    />
+                    Enable Notifications
+                  </label>
+                </div>
+                <div className="setting-item">
+                  <label>
+                    <input
+                      type="checkbox"
+                      checked={geofenceAlerts}
+                      onChange={(e) => setGeofenceAlerts(e.target.checked)}
+                    />
+                    Location-based Alerts
+                  </label>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       )}
@@ -861,8 +951,18 @@ const MobileApp: React.FC = memo(() => {
         >
           💠
         </button>
-        <button className="nav-item">📊</button>
-        <button className="nav-item">⚙️</button>
+        <button 
+          className="nav-item" 
+          onClick={() => setShowAnalytics(true)}
+        >
+          📊
+        </button>
+        <button 
+          className="nav-item" 
+          onClick={() => setShowSettings(true)}
+        >
+          ⚙️
+        </button>
       </div>
       
       <style>{`
@@ -1603,6 +1703,84 @@ const MobileApp: React.FC = memo(() => {
           right: auto;
           border-radius: 12px 0 0 12px;
           background: linear-gradient(270deg, transparent, rgba(0,0,0,0.08));
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background: rgba(0, 0, 0, 0.5);
+          z-index: 3000;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          padding: 20px;
+        }
+
+        .modal-content {
+          background: white;
+          border-radius: 12px;
+          width: 90%;
+          max-width: 500px;
+          max-height: 80vh;
+          overflow-y: auto;
+          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .modal-header {
+          display: flex;
+          justify-content: between;
+          align-items: center;
+          padding: 20px;
+          border-bottom: 1px solid #eee;
+        }
+
+        .modal-header h2 {
+          margin: 0;
+          flex: 1;
+        }
+
+        .close-button {
+          background: none;
+          border: none;
+          font-size: 18px;
+          cursor: pointer;
+          padding: 5px;
+        }
+
+        .modal-body {
+          padding: 20px;
+        }
+
+        .settings-section {
+          margin-bottom: 24px;
+        }
+
+        .settings-section h3 {
+          margin: 0 0 16px 0;
+          color: #333;
+          font-size: 16px;
+        }
+
+        .setting-item {
+          display: flex;
+          align-items: center;
+          margin-bottom: 12px;
+        }
+
+        .setting-item label {
+          display: flex;
+          align-items: center;
+          cursor: pointer;
+          font-size: 14px;
+        }
+
+        .setting-item input[type="checkbox"] {
+          margin-right: 8px;
+          transform: scale(1.2);
         }
       `}</style>
     </div>
