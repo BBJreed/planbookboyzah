@@ -331,41 +331,141 @@ canvas {
   }
 }
 
-/* Dual-page calendar layout */
-.dual-page-calendar {
+/* Dual-page planner book layout */
+.planner-book {
   display: flex;
-  flex-direction: column;
+  background: #f8f9fa;
+  border-radius: 15px;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.15), 0 0 0 1px rgba(255,255,255,0.1);
+  overflow: hidden;
+  max-width: 1200px;
   width: 100%;
-  height: 100%;
-  background: linear-gradient(to bottom, #ffffff 0%, #fefefe 100%);
+  height: 700px;
   position: relative;
 }
 
-.page-header-span {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 30px 30px 20px 30px;
-  border-bottom: 2px solid #e5e7eb;
-  background: linear-gradient(to bottom, #fafafa, #ffffff);
+.book-binding {
+  width: 40px;
+  background: linear-gradient(to bottom, #8b4513 0%, #654321 50%, #8b4513 100%);
+  position: relative;
+  z-index: 2;
+  box-shadow: inset -3px 0 5px rgba(0,0,0,0.3), inset 3px 0 5px rgba(255,255,255,0.1);
 }
 
-.page-header-span h2 {
+.binding-rings {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  height: 100%;
+  padding: 20px 0;
+}
+
+.ring {
+  width: 20px;
+  height: 20px;
+  background: linear-gradient(145deg, #c0c0c0, #808080);
+  border-radius: 50%;
+  margin: 0 auto;
+  box-shadow: 
+    inset -2px -2px 4px rgba(0,0,0,0.3),
+    inset 2px 2px 4px rgba(255,255,255,0.7),
+    0 1px 3px rgba(0,0,0,0.2);
+  border: 1px solid #666;
+}
+
+.page {
+  flex: 1;
+  height: 100%;
+  background: linear-gradient(to bottom, #ffffff 0%, #fefefe 100%);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.left-page {
+  border-right: 1px solid #e5e7eb;
+}
+
+.right-page {
+  border-left: 1px solid #e5e7eb;
+}
+
+.page-content {
+  height: 100%;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+}
+
+.page-header-left,
+.page-header-right {
+  height: 60px;
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid #e5e7eb;
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+}
+
+.page-header-left h2 {
   font-family: 'Georgia', serif;
   color: #2d3748;
-  font-size: 1.5rem;
+  font-size: 1.3rem;
   margin: 0;
-  text-align: center;
-  flex: 1;
 }
 
-.calendar-container {
+.page-header-right {
+  justify-content: flex-end;
+}
+
+.calendar-half {
   flex: 1;
   display: flex;
   justify-content: center;
-  align-items: center;
-  padding: 20px;
-  background: #ffffff;
+  align-items: flex-start;
+  margin-bottom: 20px;
+}
+
+.calendar-left {
+  padding-right: 10px;
+}
+
+.calendar-right {
+  padding-left: 10px;
+}
+
+.notes-section,
+.tasks-section {
+  height: 120px;
+  border-top: 1px solid #e5e7eb;
+  padding-top: 15px;
+}
+
+.notes-section h3,
+.tasks-section h3 {
+  font-size: 1rem;
+  color: #4a5568;
+  margin-bottom: 10px;
+  font-weight: 600;
+}
+
+.ruled-lines,
+.task-lines {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.ruled-line,
+.task-line {
+  height: 1px;
+  background: #e5e7eb;
+  width: 100%;
+}
+
+/* Remove old dual-page-calendar styles */
+.dual-page-calendar {
+  display: none;
 }
 
 .notes-bottom {

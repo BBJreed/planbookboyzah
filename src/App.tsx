@@ -130,34 +130,68 @@ const App: React.FC = () => {
               </div>
             </div>
             
-            {/* Calendar spanning both pages */}
-            <div className="dual-page-calendar">
-              <div className="page-header-span">
-                <h2>{selectedDate.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}</h2>
-                <button 
-                  className="sticker-btn"
-                  onClick={() => setShowStickerToolbar(true)}
-                  title="Add Stickers & Photos"
-                >
-                  🎨
-                </button>
+            {/* Left Page */}
+            <div className="page left-page">
+              <div className="page-content">
+                {/* Left side of calendar header */}
+                <div className="page-header-left">
+                  <h2>
+                    {selectedDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+                  </h2>
+                </div>
+                
+                {/* Left half of calendar */}
+                <div className="calendar-half calendar-left">
+                  <CalendarCanvas
+                    width={window.innerWidth * 0.35}
+                    height={window.innerHeight * 0.55}
+                    pagePosition="left"
+                  />
+                </div>
+                
+                {/* Notes section */}
+                <div className="notes-section">
+                  <h3>Notes</h3>
+                  <div className="ruled-lines">
+                    {Array.from({ length: 3 }, (_, i) => (
+                      <div key={i} className="ruled-line"></div>
+                    ))}
+                  </div>
+                </div>
               </div>
-              
-              {/* Single calendar across both pages */}
-              <div className="calendar-container">
-                <CalendarCanvas
-                  width={window.innerWidth * 0.75}
-                  height={window.innerHeight * 0.65}
-                />
-              </div>
-              
-              {/* Notes section at bottom */}
-              <div className="notes-bottom">
-                <h3>Quick Notes</h3>
-                <div className="ruled-lines">
-                  {Array.from({ length: 3 }, (_, i) => (
-                    <div key={i} className="ruled-line"></div>
-                  ))}
+            </div>
+            
+            {/* Right Page */}
+            <div className="page right-page">
+              <div className="page-content">
+                {/* Right side of calendar header */}
+                <div className="page-header-right">
+                  <button 
+                    className="sticker-btn"
+                    onClick={() => setShowStickerToolbar(true)}
+                    title="Add Stickers & Photos"
+                  >
+                    🎨
+                  </button>
+                </div>
+                
+                {/* Right half of calendar */}
+                <div className="calendar-half calendar-right">
+                  <CalendarCanvas
+                    width={window.innerWidth * 0.35}
+                    height={window.innerHeight * 0.55}
+                    pagePosition="right"
+                  />
+                </div>
+                
+                {/* Tasks section */}
+                <div className="tasks-section">
+                  <h3>Today's Tasks</h3>
+                  <div className="task-lines">
+                    {Array.from({ length: 3 }, (_, i) => (
+                      <div key={i} className="task-line"></div>
+                    ))}
+                  </div>
                 </div>
               </div>
             </div>

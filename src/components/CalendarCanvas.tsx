@@ -9,10 +9,11 @@ import { HandwritingLayer } from './HandwritingLayer';
 interface CalendarCanvasProps {
   width: number;
   height: number;
+  pagePosition?: 'left' | 'right';
 }
 
 // Memoize the CalendarCanvas component for better performance
-export const CalendarCanvas: React.FC<CalendarCanvasProps> = memo(({ width, height }) => {
+export const CalendarCanvas: React.FC<CalendarCanvasProps> = memo(({ width, height, pagePosition = 'left' }) => {
   const {
     canvasRef,
     cellDimensions,
@@ -30,6 +31,13 @@ export const CalendarCanvas: React.FC<CalendarCanvasProps> = memo(({ width, heig
     applyThemeTemplate
   } = useCalendarCanvas(width, height);
 
+  // Calculate which half of the calendar to show based on page position
+  const totalDays = days.length;
+  const daysPerPage = Math.ceil(totalDays / 2);
+  const startIndex = pagePosition === 'left' ? 0 : daysPerPage;
+  const endIndex = pagePosition === 'left' ? daysPerPage : totalDays;
+  const pageDays = days.slice(startIndex, endIndex);
+
   return (
     <div
       ref={canvasRef}
@@ -43,13 +51,13 @@ export const CalendarCanvas: React.FC<CalendarCanvasProps> = memo(({ width, heig
       }}
     >
       <svg
-        width={cellDimensions.width * 7}
-        height={cellDimensions.height * (days.length / 7)}
+        width={cellDimensions.width * Math.min(7, pageDays.length)}
+        height={cellDimensions.height * Math.ceil(pageDays.length / 7)}
         style={{ position: 'absolute', top: 0, left: 0, zIndex: 0 }}
         onDragOver={(e) => e.preventDefault()}
         onDrop={(e) => handleStickerDrop(e)}
       >
-        {days.map((day, index) => {
+        {pageDays.map((day, index) => {
           const row = Math.floor(index / 7);
           const col = index % 7;
           
