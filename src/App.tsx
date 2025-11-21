@@ -100,7 +100,7 @@ const App: React.FC = () => {
     <ErrorBoundary>
       <div className="app-container">
         <header className="app-header">
-          <h1>Artful Agenda</h1>
+          <h1>📅 Artful Agenda v2.0</h1>
           <div className="header-controls">
             <SearchBar />
             <div style={{ position: 'relative' }}>
