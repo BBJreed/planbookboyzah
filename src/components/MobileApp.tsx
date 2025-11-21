@@ -8,7 +8,7 @@ import { darkModeService } from '../services/darkModeService';
 import { enhancedNotificationService } from '../services/enhancedNotifications';
 import { geofencingService } from '../services/geofencingService';
 import MultiFingerGestures from './MultiFingerGestures';
-import AnalyticsDashboard from './AnalyticsDashboard';
+import { AnalyticsDashboard } from './AnalyticsDashboard';
 
 interface MobileAppState {
   events: CalendarEvent[];
@@ -203,11 +203,9 @@ const MobileApp: React.FC = memo(() => {
   };
 
   const setupRealtimeSync = () => {
-    // Set up real-time synchronization
-    realtimeSync.connect((operations) => {
-      // In a real app, we would update the state with the new operations
-      console.log('Real-time operations:', operations);
-    });
+    // Real-time sync disabled to prevent connection errors  
+    // TODO: Implement proper real-time sync when backend is available
+    console.log('Real-time sync setup disabled');
   };
 
   const syncWithServer = async () => {

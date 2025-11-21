@@ -34,7 +34,6 @@ export const CalendarCanvas: React.FC<CalendarCanvasProps> = memo(({ width, heig
   // Calculate which columns to show based on page position
   const totalColumns = 7; // Days of the week
   const leftPageColumns = 4; // Show 4 columns on left page (Sun, Mon, Tue, Wed)
-  const rightPageColumns = 3; // Show 3 columns on right page (Thu, Fri, Sat)
   
   const startColumn = pagePosition === 'left' ? 0 : leftPageColumns;
   const endColumn = pagePosition === 'left' ? leftPageColumns : totalColumns;
@@ -109,7 +108,7 @@ export const CalendarCanvas: React.FC<CalendarCanvasProps> = memo(({ width, heig
                     fontSize={10}
                     fill="#9ca3af"
                   >
-                    {slot}
+                    {typeof slot === 'string' ? slot : slot.label}
                   </text>
                 </g>
               ))}
