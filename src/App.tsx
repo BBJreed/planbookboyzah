@@ -138,6 +138,7 @@ const App: React.FC = () => {
                   <h2>
                     {selectedDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
                   </h2>
+                  <small className="column-info">Sun - Wed</small>
                 </div>
                 
                 {/* Left half of calendar */}
@@ -166,6 +167,7 @@ const App: React.FC = () => {
               <div className="page-content">
                 {/* Right side of calendar header */}
                 <div className="page-header-right">
+                  <small className="column-info">Thu - Sat</small>
                   <button 
                     className="sticker-btn"
                     onClick={() => setShowStickerToolbar(true)}

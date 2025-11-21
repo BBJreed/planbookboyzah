@@ -31,12 +31,14 @@ export const CalendarCanvas: React.FC<CalendarCanvasProps> = memo(({ width, heig
     applyThemeTemplate
   } = useCalendarCanvas(width, height);
 
-  // Calculate which half of the calendar to show based on page position
-  const totalDays = days.length;
-  const daysPerPage = Math.ceil(totalDays / 2);
-  const startIndex = pagePosition === 'left' ? 0 : daysPerPage;
-  const endIndex = pagePosition === 'left' ? daysPerPage : totalDays;
-  const pageDays = days.slice(startIndex, endIndex);
+  // Calculate which columns to show based on page position
+  const totalColumns = 7; // Days of the week
+  const leftPageColumns = 4; // Show 4 columns on left page (Sun, Mon, Tue, Wed)
+  const rightPageColumns = 3; // Show 3 columns on right page (Thu, Fri, Sat)
+  
+  const startColumn = pagePosition === 'left' ? 0 : leftPageColumns;
+  const endColumn = pagePosition === 'left' ? leftPageColumns : totalColumns;
+  const pageColumns = endColumn - startColumn;
 
   return (
     <div
@@ -51,20 +53,28 @@ export const CalendarCanvas: React.FC<CalendarCanvasProps> = memo(({ width, heig
       }}
     >
       <svg
-        width={cellDimensions.width * Math.min(7, pageDays.length)}
-        height={cellDimensions.height * Math.ceil(pageDays.length / 7)}
+        width={cellDimensions.width * pageColumns}
+        height={cellDimensions.height * Math.ceil(days.length / 7)}
         style={{ position: 'absolute', top: 0, left: 0, zIndex: 0 }}
         onDragOver={(e) => e.preventDefault()}
         onDrop={(e) => handleStickerDrop(e)}
       >
-        {pageDays.map((day, index) => {
+        {days.map((day, index) => {
           const row = Math.floor(index / 7);
           const col = index % 7;
+          
+          // Only render if this column is on the current page
+          if (col < startColumn || col >= endColumn) {
+            return null;
+          }
+          
+          // Adjust column position for the page
+          const pageCol = col - startColumn;
           
           return (
             <g key={day.toISOString()}>
               <rect
-                x={col * cellDimensions.width}
+                x={pageCol * cellDimensions.width}
                 y={row * cellDimensions.height}
                 width={cellDimensions.width}
                 height={cellDimensions.height}
@@ -73,7 +83,7 @@ export const CalendarCanvas: React.FC<CalendarCanvasProps> = memo(({ width, heig
                 strokeWidth={1}
               />
               <text
-                x={col * cellDimensions.width + 10}
+                x={pageCol * cellDimensions.width + 10}
                 y={row * cellDimensions.height + 20}
                 fontSize={14}
                 fontWeight="600"
@@ -86,29 +96,43 @@ export const CalendarCanvas: React.FC<CalendarCanvasProps> = memo(({ width, heig
               {timeSlots.map((slot, slotIndex) => (
                 <g key={slotIndex}>
                   <line
-                    x1={col * cellDimensions.width}
+                    x1={pageCol * cellDimensions.width}
                     y1={row * cellDimensions.height + 40 + slotIndex * 20}
-                    x2={col * cellDimensions.width + cellDimensions.width}
+                    x2={(pageCol + 1) * cellDimensions.width}
                     y2={row * cellDimensions.height + 40 + slotIndex * 20}
                     stroke="#f3f4f6"
-                    strokeWidth={1}
+                    strokeWidth={0.5}
                   />
-                  {col === 0 && slotIndex % 2 === 0 && (
-                    <text
-                      x={col * cellDimensions.width - 10}
-                      y={row * cellDimensions.height + 40 + slotIndex * 20 + 5}
-                      fontSize={10}
-                      fill="#9ca3af"
-                      textAnchor="end"
-                    >
-                      {slot.label}
-                    </text>
-                  )}
+                  <text
+                    x={pageCol * cellDimensions.width + 5}
+                    y={row * cellDimensions.height + 35 + slotIndex * 20}
+                    fontSize={10}
+                    fill="#9ca3af"
+                  >
+                    {slot}
+                  </text>
                 </g>
               ))}
             </g>
           );
         })}
+        
+        {/* Day headers */}
+        {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+          .slice(startColumn, endColumn)
+          .map((dayName, index) => (
+            <text
+              key={dayName}
+              x={index * cellDimensions.width + cellDimensions.width / 2}
+              y={15}
+              fontSize={12}
+              fontWeight="bold"
+              fill="#6b7280"
+              textAnchor="middle"
+            >
+              {dayName}
+            </text>
+          ))}
       </svg>
       
       <EventLayer 

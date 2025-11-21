@@ -414,8 +414,17 @@ canvas {
   margin: 0;
 }
 
+.column-info {
+  font-size: 0.85rem;
+  color: #6b7280;
+  margin-left: 5px;
+  font-style: italic;
+}
+
 .page-header-right {
   justify-content: flex-end;
+  align-items: center;
+  gap: 10px;
 }
 
 .calendar-half {
