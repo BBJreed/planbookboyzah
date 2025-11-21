@@ -130,38 +130,34 @@ const App: React.FC = () => {
               </div>
             </div>
             
-            {/* Left Page */}
-            <div className="page left-page">
-              <div className="page-content">
-                <div className="page-header">
-                  <h2>{selectedDate.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}</h2>
-                </div>
+            {/* Calendar spanning both pages */}
+            <div className="dual-page-calendar">
+              <div className="page-header-span">
+                <h2>{selectedDate.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}</h2>
+                <button 
+                  className="sticker-btn"
+                  onClick={() => setShowStickerToolbar(true)}
+                  title="Add Stickers & Photos"
+                >
+                  🎨
+                </button>
+              </div>
+              
+              {/* Single calendar across both pages */}
+              <div className="calendar-container">
                 <CalendarCanvas
-                  width={window.innerWidth * 0.35}
+                  width={window.innerWidth * 0.75}
                   height={window.innerHeight * 0.65}
                 />
               </div>
-            </div>
-            
-            {/* Right Page */}
-            <div className="page right-page">
-              <div className="page-content">
-                <div className="page-header">
-                  <h2>Notes & Tasks</h2>
-                  <button 
-                    className="sticker-btn"
-                    onClick={() => setShowStickerToolbar(true)}
-                    title="Add Stickers & Photos"
-                  >
-                    🎨
-                  </button>
-                </div>
-                <div className="notes-section">
-                  <div className="ruled-lines">
-                    {Array.from({ length: 20 }, (_, i) => (
-                      <div key={i} className="ruled-line"></div>
-                    ))}
-                  </div>
+              
+              {/* Notes section at bottom */}
+              <div className="notes-bottom">
+                <h3>Quick Notes</h3>
+                <div className="ruled-lines">
+                  {Array.from({ length: 3 }, (_, i) => (
+                    <div key={i} className="ruled-line"></div>
+                  ))}
                 </div>
               </div>
             </div>

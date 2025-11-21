@@ -330,3 +330,53 @@ canvas {
     --text-secondary: #e0e0e0;
   }
 }
+
+/* Dual-page calendar layout */
+.dual-page-calendar {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(to bottom, #ffffff 0%, #fefefe 100%);
+  position: relative;
+}
+
+.page-header-span {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 30px 30px 20px 30px;
+  border-bottom: 2px solid #e5e7eb;
+  background: linear-gradient(to bottom, #fafafa, #ffffff);
+}
+
+.page-header-span h2 {
+  font-family: 'Georgia', serif;
+  color: #2d3748;
+  font-size: 1.5rem;
+  margin: 0;
+  text-align: center;
+  flex: 1;
+}
+
+.calendar-container {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  background: #ffffff;
+}
+
+.notes-bottom {
+  padding: 15px 30px;
+  border-top: 1px solid #e2e8f0;
+  background: #fafafa;
+}
+
+.notes-bottom h3 {
+  font-size: 1rem;
+  color: #4a5568;
+  margin-bottom: 8px;
+  font-family: 'Georgia', serif;
+}
