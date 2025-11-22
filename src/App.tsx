@@ -117,69 +117,40 @@ const App: React.FC = () => {
         </header>
         
         <main className="app-main">
-          {/* Book Container with Proper Layout */}
+          {/* Book Calendar Container */}
           <div className="calendar-container">
-            <h2>📅 Artful Agenda Calendar</h2>
-            <div className="book">
-              <div className="left-page">
-                <div className="page-title">November 2025 - Events</div>
-                <div className="calendar-grid">
-                  <div className="week-header">
-                    <span>S</span><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span>
-                  </div>
-                  <div className="days">
-                    <CalendarCanvas
-                      width={400}
-                      height={300}
-                      pagePosition="left"
-                    />
-                  </div>
-                </div>
+            <h2>📅 Calendar</h2>
+            <div className="book" id="book">
+              <div className="left-page" id="left-page">
+                <h3>Events & Tasks</h3>
+                <ul id="events-list">
+                  <li>📅 Meeting at 2:00 PM</li>
+                  <li>🍕 Lunch with team at 12:30 PM</li>
+                  <li>💪 Gym workout at 6:00 PM</li>
+                  <li>📚 Study session at 8:00 PM</li>
+                </ul>
                 
-                {/* Events list section */}
-                <div className="events-section">
-                  <h3>Today's Events</h3>
-                  <div className="event-list">
-                    <div className="event-item">📅 Meeting at 2 PM</div>
-                    <div className="event-item">🍕 Lunch at 12 PM</div>
-                    <div className="event-item">💪 Gym at 6 PM</div>
-                  </div>
-                </div>
-              </div>
-              
-              <div className="right-page">
-                <div className="page-title">November 2025</div>
-                <div className="calendar-grid">
-                  <div className="week-header">
-                    <span>S</span><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span>
-                  </div>
-                  <div className="days">
-                    <CalendarCanvas
-                      width={400}
-                      height={300}
-                      pagePosition="right"
-                    />
-                  </div>
-                </div>
-                
-                {/* Stickers and tools section */}
-                <div className="tools-section">
+                <div className="quick-add">
+                  <h4>Quick Add</h4>
                   <button 
                     className="sticker-btn"
                     onClick={() => setShowStickerToolbar(true)}
                     title="Add Stickers & Photos"
                   >
-                    🎨 Stickers
+                    🎨 Add Stickers
                   </button>
-                  <div className="quick-notes">
-                    <h4>Quick Notes</h4>
-                    <div className="ruled-lines">
-                      {Array.from({ length: 2 }, (_, i) => (
-                        <div key={i} className="ruled-line"></div>
-                      ))}
-                    </div>
-                  </div>
                 </div>
+              </div>
+              
+              <div className="right-page" id="right-page">
+                <h3 id="month-title">November 2025</h3>
+                <div className="calendar-grid" id="monthly-grid">
+                  <CalendarCanvas
+                    width={400}
+                    height={350}
+                  />
+                </div>
+                <p>Your personalized calendar experience</p>
               </div>
             </div>
           </div>

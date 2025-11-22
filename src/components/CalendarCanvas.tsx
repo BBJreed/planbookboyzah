@@ -25,10 +25,10 @@ export const CalendarCanvas: React.FC<CalendarCanvasProps> = memo(({ width, heig
     startResizingSticker
   } = useCalendarCanvas(width, height);
 
-  // Generate calendar days for the current month
-  const currentDate = new Date();
-  const year = currentDate.getFullYear();
-  const month = currentDate.getMonth();
+  // Generate calendar days for November 2025 with specific current date
+  const currentDate = new Date(2025, 10, 21); // November 21, 2025
+  const year = 2025;
+  const month = 10; // November (0-indexed)
   
   // Get first day of month and calculate starting point
   const firstDay = new Date(year, month, 1);
@@ -50,16 +50,45 @@ export const CalendarCanvas: React.FC<CalendarCanvasProps> = memo(({ width, heig
         width: '100%',
         height: '100%',
         position: 'relative',
-        backgroundColor: 'transparent'
+        backgroundColor: 'transparent',
+        display: 'flex',
+        flexDirection: 'column'
       }}
     >
-      {/* Render calendar days as React elements instead of SVG */}
+      {/* Week headers */}
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(7, 1fr)',
+        gap: '1px',
+        marginBottom: '2px'
+      }}>
+        {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((day, index) => (
+          <div
+            key={index}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              backgroundColor: '#374151',
+              color: 'white',
+              fontWeight: 'bold',
+              fontSize: '0.8rem',
+              padding: '8px',
+              border: '1px solid #4b5563'
+            }}
+          >
+            {day}
+          </div>
+        ))}
+      </div>
+      
+      {/* Calendar grid */}
       <div style={{
         display: 'grid',
         gridTemplateColumns: 'repeat(7, 1fr)',
         gap: '1px',
         width: '100%',
-        height: '100%'
+        flex: 1
       }}>
         {calendarDays.map((date) => {
           const isCurrentMonth = date.getMonth() === month;
@@ -73,26 +102,40 @@ export const CalendarCanvas: React.FC<CalendarCanvasProps> = memo(({ width, heig
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                backgroundColor: isToday ? '#fef3c7' : (isCurrentMonth ? 'white' : '#f8f9fa'),
+                backgroundColor: isToday ? '#ffd700' : (isCurrentMonth ? 'white' : '#f8f9fa'),
                 color: isCurrentMonth ? '#1f2937' : '#9ca3af',
                 fontWeight: isToday ? 'bold' : 'normal',
-                border: '1px solid #e5e7eb',
-                minHeight: '30px',
+                border: '1px solid #ddd',
+                minHeight: '40px',
                 fontSize: '0.9rem',
                 cursor: 'pointer',
-                transition: 'background-color 0.2s ease'
+                transition: 'background-color 0.2s ease',
+                position: 'relative'
+              }}
+              draggable={true}
+              onDragStart={(e) => {
+                e.dataTransfer.setData('text/plain', date.toISOString());
+                console.log('Drag started from:', date);
+              }}
+              onDrop={(e) => {
+                e.preventDefault();
+                const draggedDate = e.dataTransfer.getData('text/plain');
+                console.log('Dropped on:', date, 'From:', draggedDate);
+                // Handle drop logic here
+              }}
+              onDragOver={(e) => {
+                e.preventDefault();
               }}
               onClick={() => {
-                // Handle date click
                 console.log('Selected date:', date);
               }}
               onMouseEnter={(e) => {
                 if (isCurrentMonth) {
-                  e.currentTarget.style.backgroundColor = '#f3f4f6';
+                  e.currentTarget.style.backgroundColor = isToday ? '#ffed4e' : '#f3f4f6';
                 }
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = isToday ? '#fef3c7' : (isCurrentMonth ? 'white' : '#f8f9fa');
+                e.currentTarget.style.backgroundColor = isToday ? '#ffd700' : (isCurrentMonth ? 'white' : '#f8f9fa');
               }}
             >
               {dayNumber}
