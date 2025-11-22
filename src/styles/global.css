@@ -331,55 +331,62 @@ canvas {
   }
 }
 
-/* Dual-page planner book layout */
-.planner-book {
-  display: flex;
-  background: #f8f9fa;
-  border-radius: 15px;
-  box-shadow: 0 20px 40px rgba(0,0,0,0.15), 0 0 0 1px rgba(255,255,255,0.1);
-  overflow: hidden;
-  max-width: 1200px;
-  width: 100%;
-  height: 700px;
-  position: relative;
-}
-
-.book-binding {
-  width: 40px;
-  background: linear-gradient(to bottom, #8b4513 0%, #654321 50%, #8b4513 100%);
-  position: relative;
-  z-index: 2;
-  box-shadow: inset -3px 0 5px rgba(0,0,0,0.3), inset 3px 0 5px rgba(255,255,255,0.1);
-}
-
-.binding-rings {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-evenly;
-  height: 100%;
+/* Book Layout Styles */
+.calendar-container {
+  max-width: 90vw; /* Prevents overflow on any device */
+  margin: 0 auto; /* Centers it */
   padding: 20px 0;
 }
 
-.ring {
-  width: 20px;
-  height: 20px;
-  background: linear-gradient(145deg, #c0c0c0, #808080);
-  border-radius: 50%;
-  margin: 0 auto;
-  box-shadow: 
-    inset -2px -2px 4px rgba(0,0,0,0.3),
-    inset 2px 2px 4px rgba(255,255,255,0.7),
-    0 1px 3px rgba(0,0,0,0.2);
-  border: 1px solid #666;
+.calendar-container h2 {
+  text-align: center;
+  margin-bottom: 20px;
+  font-family: 'Georgia', serif;
+  color: #2d3748;
 }
 
-.page {
-  flex: 1;
-  height: 100%;
-  background: linear-gradient(to bottom, #ffffff 0%, #fefefe 100%);
+.book {
+  display: flex; /* Split into left/right */
+  justify-content: space-between;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  background-size: cover;
+  width: 100%;
+  min-height: 60vh; /* Adjust height for proportion */
   position: relative;
+  border: 2px solid #8b4513;
+  border-radius: 15px;
+  overflow: hidden; /* Stops content running off */
+  box-shadow: 
+    0 20px 40px rgba(0,0,0,0.15),
+    inset 0 0 0 1px rgba(255,255,255,0.1),
+    0 0 0 3px #654321;
+}
+
+/* Add book binding effect in the center */
+.book::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: linear-gradient(to bottom, #8b4513 0%, #654321 50%, #8b4513 100%);
+  transform: translateX(-50%);
+  z-index: 10;
+  box-shadow: 
+    -1px 0 3px rgba(0,0,0,0.3),
+    1px 0 3px rgba(0,0,0,0.3);
+}
+
+.left-page, .right-page {
+  width: 48%; /* Even split, with gap */
+  padding: 20px;
+  box-sizing: border-box; /* Includes padding in width */
   display: flex;
   flex-direction: column;
+  align-items: center;
+  background: linear-gradient(to bottom, #ffffff 0%, #fefefe 100%);
+  position: relative;
 }
 
 .left-page {
@@ -390,91 +397,153 @@ canvas {
   border-left: 1px solid #e5e7eb;
 }
 
-.page-content {
-  height: 100%;
-  padding: 20px;
-  display: flex;
-  flex-direction: column;
-}
-
-.page-header-left,
-.page-header-right {
-  height: 60px;
-  display: flex;
-  align-items: center;
-  border-bottom: 1px solid #e5e7eb;
-  margin-bottom: 20px;
-  padding-bottom: 10px;
-}
-
-.page-header-left h2 {
+.page-title {
+  font-size: 1.3em;
+  margin-bottom: 15px;
   font-family: 'Georgia', serif;
   color: #2d3748;
-  font-size: 1.3rem;
-  margin: 0;
+  text-align: center;
 }
 
-.column-info {
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr); /* 7 days */
+  gap: 2px;
+  width: 100%;
+  max-width: 100%; /* No overflow */
+  margin-bottom: 20px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.week-header {
+  display: contents; /* Flows into grid */
+}
+
+.week-header span {
+  background: #f8f9fa;
+  padding: 8px 4px;
+  text-align: center;
+  font-weight: 600;
   font-size: 0.85rem;
   color: #6b7280;
-  margin-left: 5px;
-  font-style: italic;
+  border-bottom: 1px solid #e5e7eb;
 }
 
-.page-header-right {
-  justify-content: flex-end;
-  align-items: center;
-  gap: 10px;
+.days {
+  display: contents; /* Flows into grid */
 }
 
-.calendar-half {
-  flex: 1;
+.days span {
+  text-align: center;
+  padding: 8px 4px;
+  border-right: 1px solid #f3f4f6;
+  border-bottom: 1px solid #f3f4f6;
+  background: white;
+  font-size: 0.9rem;
+  min-height: 30px;
   display: flex;
+  align-items: center;
   justify-content: center;
-  align-items: flex-start;
-  margin-bottom: 20px;
 }
 
-.calendar-left {
-  padding-right: 10px;
+.events-section, .tools-section {
+  width: 100%;
+  margin-top: 20px;
 }
 
-.calendar-right {
-  padding-left: 10px;
-}
-
-.notes-section,
-.tasks-section {
-  height: 120px;
-  border-top: 1px solid #e5e7eb;
-  padding-top: 15px;
-}
-
-.notes-section h3,
-.tasks-section h3 {
+.events-section h3, .tools-section h4 {
   font-size: 1rem;
-  color: #4a5568;
   margin-bottom: 10px;
-  font-weight: 600;
+  color: #4a5568;
+  border-bottom: 1px solid #e5e7eb;
+  padding-bottom: 5px;
 }
 
-.ruled-lines,
-.task-lines {
+.event-list {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.event-item {
+  background: #f0f9ff;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  border-left: 3px solid #3b82f6;
+}
+
+.sticker-btn {
+  background: #3b82f6;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  margin-bottom: 15px;
+  transition: all 0.2s ease;
+}
+
+.sticker-btn:hover {
+  background: #2563eb;
+  transform: translateY(-1px);
+}
+
+.quick-notes {
+  width: 100%;
+}
+
+.ruled-lines {
   display: flex;
   flex-direction: column;
   gap: 8px;
 }
 
-.ruled-line,
-.task-line {
+.ruled-line {
   height: 1px;
   background: #e5e7eb;
   width: 100%;
 }
 
-/* Remove old dual-page-calendar styles */
-.dual-page-calendar {
-  display: none;
+/* Responsive for mobile/phone */
+@media (max-width: 768px) {
+  .book {
+    flex-direction: column; /* Stack pages vertically on small screens */
+    height: auto;
+    min-height: auto;
+  }
+  
+  .book::before {
+    left: 0;
+    right: 0;
+    top: 50%;
+    bottom: auto;
+    width: auto;
+    height: 3px;
+    transform: translateY(-50%);
+  }
+  
+  .left-page, .right-page {
+    width: 100%;
+    margin-bottom: 0;
+    border: none;
+  }
+  
+  .left-page {
+    border-bottom: 1px solid #e5e7eb;
+    border-right: none;
+  }
+  
+  .right-page {
+    border-left: none;
+  }
+  
+  .calendar-container {
+    max-width: 95vw;
+  }
 }
 
 .notes-bottom {

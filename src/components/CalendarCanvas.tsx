@@ -1,5 +1,4 @@
 import React, { memo } from 'react';
-import { format } from 'date-fns';
 import { useCalendarCanvas } from './useCalendarCanvas';
 import { EventLayer } from './EventLayer';
 import { TaskLayer } from './TaskLayer';
@@ -12,127 +11,95 @@ interface CalendarCanvasProps {
   pagePosition?: 'left' | 'right';
 }
 
-// Memoize the CalendarCanvas component for better performance
-export const CalendarCanvas: React.FC<CalendarCanvasProps> = memo(({ width, height, pagePosition = 'left' }) => {
+export const CalendarCanvas: React.FC<CalendarCanvasProps> = memo(({ width, height }) => {
   const {
     canvasRef,
     cellDimensions,
-    days,
-    timeSlots,
     visibility,
     events,
     decorations,
     handwriting,
     tasks,
     dateToPosition,
-    handleStickerDrop,
     startDraggingSticker,
-    startResizingSticker,
-    applyThemeTemplate
+    startResizingSticker
   } = useCalendarCanvas(width, height);
 
-  // Calculate which columns to show based on page position
-  const totalColumns = 7; // Days of the week
-  const leftPageColumns = 4; // Show 4 columns on left page (Sun, Mon, Tue, Wed)
+  // Generate calendar days for the current month
+  const currentDate = new Date();
+  const year = currentDate.getFullYear();
+  const month = currentDate.getMonth();
   
-  const startColumn = pagePosition === 'left' ? 0 : leftPageColumns;
-  const endColumn = pagePosition === 'left' ? leftPageColumns : totalColumns;
-  const pageColumns = endColumn - startColumn;
+  // Get first day of month and calculate starting point
+  const firstDay = new Date(year, month, 1);
+  const startDate = new Date(firstDay);
+  startDate.setDate(startDate.getDate() - firstDay.getDay()); // Start from Sunday
+  
+  // Generate 42 days (6 weeks) for a complete calendar grid
+  const calendarDays = [];
+  for (let i = 0; i < 42; i++) {
+    const date = new Date(startDate);
+    date.setDate(startDate.getDate() + i);
+    calendarDays.push(date);
+  }
 
   return (
     <div
       ref={canvasRef}
       style={{
+        width: '100%',
+        height: '100%',
         position: 'relative',
-        width,
-        height,
-        overflow: 'auto',
-        backgroundColor: '#ffffff',
-        ...applyThemeTemplate()
+        backgroundColor: 'transparent'
       }}
     >
-      <svg
-        width={cellDimensions.width * pageColumns}
-        height={cellDimensions.height * Math.ceil(days.length / 7)}
-        style={{ position: 'absolute', top: 0, left: 0, zIndex: 0 }}
-        onDragOver={(e) => e.preventDefault()}
-        onDrop={(e) => handleStickerDrop(e)}
-      >
-        {days.map((day, index) => {
-          const row = Math.floor(index / 7);
-          const col = index % 7;
-          
-          // Only render if this column is on the current page
-          if (col < startColumn || col >= endColumn) {
-            return null;
-          }
-          
-          // Adjust column position for the page
-          const pageCol = col - startColumn;
+      {/* Render calendar days as React elements instead of SVG */}
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(7, 1fr)',
+        gap: '1px',
+        width: '100%',
+        height: '100%'
+      }}>
+        {calendarDays.map((date) => {
+          const isCurrentMonth = date.getMonth() === month;
+          const isToday = date.toDateString() === currentDate.toDateString();
+          const dayNumber = date.getDate();
           
           return (
-            <g key={day.toISOString()}>
-              <rect
-                x={pageCol * cellDimensions.width}
-                y={row * cellDimensions.height}
-                width={cellDimensions.width}
-                height={cellDimensions.height}
-                fill="white"
-                stroke="#e5e7eb"
-                strokeWidth={1}
-              />
-              <text
-                x={pageCol * cellDimensions.width + 10}
-                y={row * cellDimensions.height + 20}
-                fontSize={14}
-                fontWeight="600"
-                fill="#374151"
-              >
-                {format(day, 'd')}
-              </text>
-              
-              {/* Time slots for weekly view */}
-              {timeSlots.map((slot, slotIndex) => (
-                <g key={slotIndex}>
-                  <line
-                    x1={pageCol * cellDimensions.width}
-                    y1={row * cellDimensions.height + 40 + slotIndex * 20}
-                    x2={(pageCol + 1) * cellDimensions.width}
-                    y2={row * cellDimensions.height + 40 + slotIndex * 20}
-                    stroke="#f3f4f6"
-                    strokeWidth={0.5}
-                  />
-                  <text
-                    x={pageCol * cellDimensions.width + 5}
-                    y={row * cellDimensions.height + 35 + slotIndex * 20}
-                    fontSize={10}
-                    fill="#9ca3af"
-                  >
-                    {typeof slot === 'string' ? slot : slot.label}
-                  </text>
-                </g>
-              ))}
-            </g>
+            <div
+              key={date.toISOString()}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                backgroundColor: isToday ? '#fef3c7' : (isCurrentMonth ? 'white' : '#f8f9fa'),
+                color: isCurrentMonth ? '#1f2937' : '#9ca3af',
+                fontWeight: isToday ? 'bold' : 'normal',
+                border: '1px solid #e5e7eb',
+                minHeight: '30px',
+                fontSize: '0.9rem',
+                cursor: 'pointer',
+                transition: 'background-color 0.2s ease'
+              }}
+              onClick={() => {
+                // Handle date click
+                console.log('Selected date:', date);
+              }}
+              onMouseEnter={(e) => {
+                if (isCurrentMonth) {
+                  e.currentTarget.style.backgroundColor = '#f3f4f6';
+                }
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = isToday ? '#fef3c7' : (isCurrentMonth ? 'white' : '#f8f9fa');
+              }}
+            >
+              {dayNumber}
+            </div>
           );
         })}
-        
-        {/* Day headers */}
-        {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
-          .slice(startColumn, endColumn)
-          .map((dayName, index) => (
-            <text
-              key={dayName}
-              x={index * cellDimensions.width + cellDimensions.width / 2}
-              y={15}
-              fontSize={12}
-              fontWeight="bold"
-              fill="#6b7280"
-              textAnchor="middle"
-            >
-              {dayName}
-            </text>
-          ))}
-      </svg>
+      </div>
       
       <EventLayer 
         events={events} 

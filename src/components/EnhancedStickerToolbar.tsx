@@ -1,7 +1,6 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useStore } from '../stores/appStore';
 import { DecorativeElement } from '../types';
-import { useCamera } from '../hooks/useCamera';
 
 interface StickerToolbarProps {
   isOpen: boolean;
@@ -12,13 +11,28 @@ export const StickerToolbar: React.FC<StickerToolbarProps> = ({ isOpen, onClose 
   const { addDecoration, selectedDate } = useStore();
   const [rotation, setRotation] = useState(0);
   const [size, setSize] = useState(40);
-  const [activeTab, setActiveTab] = useState('free'); // 'free', 'camera', 'custom'
-  const [cropMode, setCropMode] = useState(false);
-  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState('stickers'); // 'stickers', 'camera', 'upload'
+  const [showCameraPreview, setShowCameraPreview] = useState(false);
+  const [stickerLibrary, setStickerLibrary] = useState<string[]>([]);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const { takePhoto, stream, startCamera, stopCamera } = useCamera();
-  
-  // Free sticker libraries (using emoji and free icons)
+  const [cameraStream, setCameraStream] = useState<MediaStream | null>(null);
+
+  // Initialize sticker library with example stickers and emoji
+  useEffect(() => {
+    const initialStickers = [
+      'https://cdn.jsdelivr.net/npm/twemoji@14.0.2/assets/72x72/1f389.png', // party
+      'https://cdn.jsdelivr.net/npm/twemoji@14.0.2/assets/72x72/2728.png', // sparkles
+      'https://cdn.jsdelivr.net/npm/twemoji@14.0.2/assets/72x72/1f31f.png', // star
+      'https://cdn.jsdelivr.net/npm/twemoji@14.0.2/assets/72x72/1f49c.png', // purple heart
+      'https://cdn.jsdelivr.net/npm/twemoji@14.0.2/assets/72x72/1f308.png', // rainbow
+      'https://cdn.jsdelivr.net/npm/twemoji@14.0.2/assets/72x72/1f680.png', // rocket
+    ];
+    setStickerLibrary(initialStickers);
+  }, []);
+
+  // Free sticker categories (emoji)
   const freeStickerCategories = {
     emotions: ['😀', '😂', '🥰', '😍', '🤩', '😊', '😎', '🤔', '😴', '🤗'],
     nature: ['🌟', '⭐', '✨', '🌙', '☀️', '🌈', '🌸', '🌺', '🍀', '🦋'],
@@ -26,28 +40,73 @@ export const StickerToolbar: React.FC<StickerToolbarProps> = ({ isOpen, onClose 
     food: ['🍎', '🍕', '🍰', '🍭', '🍪', '🥤', '☕', '🍯', '🍓', '🥑'],
     activities: ['🎨', '🎵', '🎮', '📷', '✈️', '🚲', '🏃‍♀️', '💪', '🧘‍♀️', '📖']
   };
-  
-  // Sample premium-style sticker URLs (free resources)
-  const premiumStickers = [
-    'https://cdn.jsdelivr.net/npm/twemoji@14.0.2/assets/72x72/1f389.png', // party
-    'https://cdn.jsdelivr.net/npm/twemoji@14.0.2/assets/72x72/2728.png', // sparkles
-    'https://cdn.jsdelivr.net/npm/twemoji@14.0.2/assets/72x72/1f31f.png', // star
-    'https://cdn.jsdelivr.net/npm/twemoji@14.0.2/assets/72x72/1f49c.png', // purple heart
-    'https://cdn.jsdelivr.net/npm/twemoji@14.0.2/assets/72x72/1f308.png', // rainbow
-    'https://cdn.jsdelivr.net/npm/twemoji@14.0.2/assets/72x72/1f680.png', // rocket
-  ];
 
-  const handleStickerSelect = (imageUrl: string, isEmoji: boolean = false) => {
+  // Camera functionality
+  const startCamera = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+      setCameraStream(stream);
+      setShowCameraPreview(true);
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+        videoRef.current.play();
+      }
+    } catch (error) {
+      console.error('Camera access denied or error:', error);
+      alert('Allow camera permission in browser settings.');
+    }
+  };
+
+  const capturePhoto = () => {
+    if (videoRef.current && canvasRef.current) {
+      const canvas = canvasRef.current;
+      const video = videoRef.current;
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      canvas.getContext('2d')?.drawImage(video, 0, 0);
+      const newStickerUrl = canvas.toDataURL('image/png');
+      
+      // Add to sticker library
+      setStickerLibrary(prev => [...prev, newStickerUrl]);
+      
+      // Stop camera and close preview
+      stopCamera();
+    }
+  };
+
+  const stopCamera = () => {
+    if (cameraStream) {
+      cameraStream.getTracks().forEach(track => track.stop());
+      setCameraStream(null);
+    }
+    setShowCameraPreview(false);
+  };
+
+  // File upload functionality
+  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file && file.type.startsWith('image/')) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const result = e.target?.result as string;
+        setStickerLibrary(prev => [...prev, result]);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  // Place sticker function
+  const placeSticker = (stickerUrl: string, isEmoji: boolean = false) => {
     const newSticker: DecorativeElement = {
       id: `sticker-${Date.now()}`,
       type: 'sticker',
       position: {
         dateX: selectedDate.toISOString(),
-        offsetY: 0,
+        offsetY: Math.random() * 100, // Random position
         zIndex: 100
       },
-      imageUrl: isEmoji ? undefined : imageUrl,
-      content: isEmoji ? imageUrl : undefined,
+      imageUrl: isEmoji ? undefined : stickerUrl,
+      content: isEmoji ? stickerUrl : undefined,
       style: {
         width: size,
         height: size,
@@ -55,342 +114,322 @@ export const StickerToolbar: React.FC<StickerToolbarProps> = ({ isOpen, onClose 
         opacity: 1
       }
     };
-    
+
     addDecoration(newSticker);
-    onClose();
-  };
-
-  const handleCameraCapture = async () => {
-    try {
-      await startCamera();
-      const photoData = takePhoto();
-      if (photoData) {
-        setSelectedImage(photoData);
-        setCropMode(true);
-      }
-      stopCamera();
-    } catch (error) {
-      console.error('Failed to capture photo:', error);
-    }
-  };
-
-  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const result = e.target?.result as string;
-        setSelectedImage(result);
-        setCropMode(true);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
-  const handleCropConfirm = () => {
-    if (selectedImage) {
-      handleStickerSelect(selectedImage);
-      setCropMode(false);
-      setSelectedImage(null);
-    }
+    
+    // Add visual feedback
+    console.log('Sticker added to calendar:', newSticker);
   };
 
   if (!isOpen) return null;
 
   return (
-    <div style={{
-      position: 'fixed',
-      top: 0,
-      left: 0,
-      right: 0,
-      bottom: 0,
-      background: 'rgba(0,0,0,0.5)',
-      zIndex: 1000,
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center'
-    }}>
-      <div style={{
-        background: 'white',
-        borderRadius: '15px',
-        padding: '30px',
-        maxWidth: '600px',
-        maxHeight: '80vh',
-        overflow: 'auto',
-        boxShadow: '0 20px 40px rgba(0,0,0,0.3)'
-      }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+    <div className="sticker-toolbar-overlay">
+      <div className="sticker-toolbar">
+        <div className="sticker-header">
           <h2>🎨 Stickers & Photos</h2>
-          <button onClick={onClose} style={{ 
-            background: 'none', 
-            border: 'none', 
-            fontSize: '24px', 
-            cursor: 'pointer' 
-          }}>✕</button>
+          <button onClick={onClose} className="close-btn">❌</button>
         </div>
 
         {/* Tab Navigation */}
-        <div style={{ display: 'flex', marginBottom: '20px', borderBottom: '1px solid #eee' }}>
+        <div className="tab-navigation">
           <button 
-            onClick={() => setActiveTab('free')}
-            style={{
-              padding: '10px 20px',
-              border: 'none',
-              background: activeTab === 'free' ? '#4299e1' : 'transparent',
-              color: activeTab === 'free' ? 'white' : '#666',
-              borderRadius: '10px 10px 0 0'
-            }}
+            className={`tab ${activeTab === 'stickers' ? 'active' : ''}`}
+            onClick={() => setActiveTab('stickers')}
           >
-            Free Stickers
+            🏷️ Stickers
           </button>
           <button 
+            className={`tab ${activeTab === 'camera' ? 'active' : ''}`}
             onClick={() => setActiveTab('camera')}
-            style={{
-              padding: '10px 20px',
-              border: 'none',
-              background: activeTab === 'camera' ? '#4299e1' : 'transparent',
-              color: activeTab === 'camera' ? 'white' : '#666',
-              borderRadius: '10px 10px 0 0'
-            }}
           >
             📷 Camera
           </button>
           <button 
-            onClick={() => setActiveTab('custom')}
-            style={{
-              padding: '10px 20px',
-              border: 'none',
-              background: activeTab === 'custom' ? '#4299e1' : 'transparent',
-              color: activeTab === 'custom' ? 'white' : '#666',
-              borderRadius: '10px 10px 0 0'
-            }}
+            className={`tab ${activeTab === 'upload' ? 'active' : ''}`}
+            onClick={() => setActiveTab('upload')}
           >
-            Upload Photo
+            📁 Upload
           </button>
         </div>
 
-        {/* Controls */}
-        <div style={{ display: 'flex', gap: '15px', marginBottom: '20px' }}>
-          <div>
-            <label>Size: {size}px</label>
-            <input 
-              type="range" 
-              min="20" 
-              max="100" 
-              value={size} 
-              onChange={(e) => setSize(Number(e.target.value))}
-              style={{ width: '100%' }}
-            />
-          </div>
-          <div>
-            <label>Rotation: {rotation}°</label>
-            <input 
-              type="range" 
-              min="0" 
-              max="360" 
-              value={rotation} 
-              onChange={(e) => setRotation(Number(e.target.value))}
-              style={{ width: '100%' }}
-            />
-          </div>
-        </div>
-
-        {/* Content based on active tab */}
-        {activeTab === 'free' && (
-          <div>
-            {Object.entries(freeStickerCategories).map(([category, emojis]) => (
-              <div key={category} style={{ marginBottom: '20px' }}>
-                <h3 style={{ textTransform: 'capitalize', marginBottom: '10px' }}>{category}</h3>
-                <div style={{ 
-                  display: 'grid', 
-                  gridTemplateColumns: 'repeat(auto-fill, minmax(50px, 1fr))', 
-                  gap: '10px' 
-                }}>
-                  {emojis.map((emoji, index) => (
-                    <button
-                      key={index}
-                      onClick={() => handleStickerSelect(emoji, true)}
-                      style={{
-                        fontSize: '24px',
-                        padding: '10px',
-                        border: '2px solid #eee',
-                        borderRadius: '10px',
-                        background: 'white',
-                        cursor: 'pointer',
-                        transition: 'all 0.2s'
-                      }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.background = '#f0f8ff';
-                        e.currentTarget.style.transform = 'scale(1.1)';
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.background = 'white';
-                        e.currentTarget.style.transform = 'scale(1)';
-                      }}
-                    >
-                      {emoji}
-                    </button>
-                  ))}
+        {/* Stickers Tab */}
+        {activeTab === 'stickers' && (
+          <div className="stickers-content">
+            {/* Emoji Categories */}
+            <div className="emoji-categories">
+              <h3>Free Emoji Stickers</h3>
+              {Object.entries(freeStickerCategories).map(([category, emojis]) => (
+                <div key={category} className="emoji-category">
+                  <h4>{category.charAt(0).toUpperCase() + category.slice(1)}</h4>
+                  <div className="emoji-grid">
+                    {emojis.map((emoji, index) => (
+                      <button
+                        key={index}
+                        className="emoji-sticker"
+                        onClick={() => placeSticker(emoji, true)}
+                      >
+                        {emoji}
+                      </button>
+                    ))}
+                  </div>
                 </div>
-              </div>
-            ))}
-            
-            <div style={{ marginTop: '30px' }}>
-              <h3>Premium Style</h3>
-              <div style={{ 
-                display: 'grid', 
-                gridTemplateColumns: 'repeat(auto-fill, minmax(60px, 1fr))', 
-                gap: '10px' 
-              }}>
-                {premiumStickers.map((url, index) => (
-                  <button
+              ))}
+            </div>
+
+            {/* Premium Stickers */}
+            <div className="premium-stickers">
+              <h3>Premium Stickers</h3>
+              <div className="sticker-grid">
+                {stickerLibrary.map((stickerUrl, index) => (
+                  <img
                     key={index}
-                    onClick={() => handleStickerSelect(url)}
-                    style={{
-                      padding: '5px',
-                      border: '2px solid #eee',
-                      borderRadius: '10px',
-                      background: 'white',
-                      cursor: 'pointer'
-                    }}
-                  >
-                    <img 
-                      src={url} 
-                      alt="Sticker" 
-                      style={{ width: '40px', height: '40px' }}
-                      onError={(e) => {
-                        // Fallback if image fails to load
-                        e.currentTarget.style.display = 'none';
-                      }}
-                    />
-                  </button>
+                    src={stickerUrl}
+                    alt="Sticker"
+                    className="sticker-preview"
+                    onClick={() => placeSticker(stickerUrl)}
+                  />
                 ))}
               </div>
             </div>
           </div>
         )}
 
+        {/* Camera Tab */}
         {activeTab === 'camera' && (
-          <div style={{ textAlign: 'center' }}>
-            {stream !== null ? (
-              <div>
-                <p style={{ marginBottom: '20px' }}>Take a photo to turn into a sticker!</p>
-                <button 
-                  onClick={handleCameraCapture}
-                  style={{
-                    padding: '15px 30px',
-                    fontSize: '18px',
-                    background: 'linear-gradient(145deg, #48bb78, #38a169)',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: '25px',
-                    cursor: 'pointer'
-                  }}
-                >
-                  📸 Take Photo
-                </button>
-              </div>
+          <div className="camera-content">
+            <h3>📷 Take Photo</h3>
+            {!showCameraPreview ? (
+              <button onClick={startCamera} className="camera-btn">
+                Start Camera
+              </button>
             ) : (
-              <p>Camera not supported on this device</p>
+              <div className="camera-preview">
+                <video ref={videoRef} autoPlay playsInline style={{ width: '100%', maxWidth: '300px' }} />
+                <canvas ref={canvasRef} style={{ display: 'none' }} />
+                <div className="camera-controls">
+                  <button onClick={capturePhoto} className="capture-btn">
+                    📸 Capture
+                  </button>
+                  <button onClick={stopCamera} className="stop-camera-btn">
+                    ❌ Stop
+                  </button>
+                </div>
+              </div>
             )}
           </div>
         )}
 
-        {activeTab === 'custom' && (
-          <div style={{ textAlign: 'center' }}>
-            <p style={{ marginBottom: '20px' }}>Upload your own photo to turn into a sticker!</p>
-            <button 
-              onClick={() => fileInputRef.current?.click()}
-              style={{
-                padding: '15px 30px',
-                fontSize: '18px',
-                background: 'linear-gradient(145deg, #ed8936, #dd6b20)',
-                color: 'white',
-                border: 'none',
-                borderRadius: '25px',
-                cursor: 'pointer'
-              }}
-            >
-              📁 Choose Photo
-            </button>
-            <input 
+        {/* Upload Tab */}
+        {activeTab === 'upload' && (
+          <div className="upload-content">
+            <h3>📁 Upload Image</h3>
+            <input
               ref={fileInputRef}
-              type="file" 
+              type="file"
               accept="image/*"
               onChange={handleFileUpload}
               style={{ display: 'none' }}
             />
+            <button 
+              onClick={() => fileInputRef.current?.click()}
+              className="upload-btn"
+            >
+              Choose Image
+            </button>
+            <p>Upload your own images to use as stickers!</p>
           </div>
         )}
 
-        {/* Crop Modal */}
-        {cropMode && selectedImage && (
-          <div style={{
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            background: 'rgba(0,0,0,0.8)',
-            zIndex: 1001,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center'
-          }}>
-            <div style={{
-              background: 'white',
-              padding: '20px',
-              borderRadius: '15px',
-              textAlign: 'center'
-            }}>
-              <h3>Preview Your Sticker</h3>
-              <div style={{ 
-                margin: '20px 0',
-                transform: `rotate(${rotation}deg)`
-              }}>
-                <img 
-                  src={selectedImage} 
-                  alt="Preview" 
-                  style={{ 
-                    width: `${size}px`, 
-                    height: `${size}px`,
-                    borderRadius: '10px',
-                    objectFit: 'cover'
-                  }} 
-                />
-              </div>
-              <div style={{ display: 'flex', gap: '10px', justifyContent: 'center' }}>
-                <button 
-                  onClick={handleCropConfirm}
-                  style={{
-                    padding: '10px 20px',
-                    background: '#48bb78',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: '10px',
-                    cursor: 'pointer'
-                  }}
-                >
-                  ✓ Add to Planner
-                </button>
-                <button 
-                  onClick={() => { setCropMode(false); setSelectedImage(null); }}
-                  style={{
-                    padding: '10px 20px',
-                    background: '#e53e3e',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: '10px',
-                    cursor: 'pointer'
-                  }}
-                >
-                  ✕ Cancel
-                </button>
-              </div>
-            </div>
+        {/* Controls */}
+        <div className="sticker-controls">
+          <div className="control-group">
+            <label>Size: {size}px</label>
+            <input
+              type="range"
+              min="20"
+              max="100"
+              value={size}
+              onChange={(e) => setSize(Number(e.target.value))}
+            />
           </div>
-        )}
+          <div className="control-group">
+            <label>Rotation: {rotation}°</label>
+            <input
+              type="range"
+              min="0"
+              max="360"
+              value={rotation}
+              onChange={(e) => setRotation(Number(e.target.value))}
+            />
+          </div>
+        </div>
       </div>
+
+      <style>{`
+        .sticker-toolbar-overlay {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background: rgba(0, 0, 0, 0.5);
+          z-index: 1000;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+        }
+
+        .sticker-toolbar {
+          background: white;
+          border-radius: 12px;
+          padding: 20px;
+          max-width: 500px;
+          max-height: 80vh;
+          overflow-y: auto;
+          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .sticker-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 20px;
+          border-bottom: 1px solid #e5e7eb;
+          padding-bottom: 15px;
+        }
+
+        .sticker-header h2 {
+          margin: 0;
+          color: #1f2937;
+        }
+
+        .close-btn {
+          background: none;
+          border: none;
+          font-size: 18px;
+          cursor: pointer;
+        }
+
+        .tab-navigation {
+          display: flex;
+          margin-bottom: 20px;
+          border-bottom: 1px solid #e5e7eb;
+        }
+
+        .tab {
+          background: none;
+          border: none;
+          padding: 10px 15px;
+          cursor: pointer;
+          border-bottom: 2px solid transparent;
+          transition: all 0.2s ease;
+        }
+
+        .tab.active {
+          border-bottom-color: #3b82f6;
+          color: #3b82f6;
+          font-weight: 600;
+        }
+
+        .emoji-category {
+          margin-bottom: 20px;
+        }
+
+        .emoji-category h4 {
+          margin: 0 0 10px 0;
+          color: #4a5568;
+          font-size: 0.9rem;
+          text-transform: capitalize;
+        }
+
+        .emoji-grid, .sticker-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fill, minmax(40px, 1fr));
+          gap: 8px;
+          margin-bottom: 15px;
+        }
+
+        .emoji-sticker {
+          background: none;
+          border: 1px solid #e5e7eb;
+          border-radius: 6px;
+          padding: 8px;
+          font-size: 20px;
+          cursor: pointer;
+          transition: all 0.2s ease;
+        }
+
+        .emoji-sticker:hover {
+          background: #f3f4f6;
+          transform: scale(1.1);
+        }
+
+        .sticker-preview {
+          width: 40px;
+          height: 40px;
+          object-fit: cover;
+          border-radius: 6px;
+          cursor: pointer;
+          border: 1px solid #e5e7eb;
+          transition: transform 0.2s ease;
+        }
+
+        .sticker-preview:hover {
+          transform: scale(1.1);
+        }
+
+        .camera-btn, .capture-btn, .stop-camera-btn, .upload-btn {
+          background: #3b82f6;
+          color: white;
+          border: none;
+          padding: 10px 20px;
+          border-radius: 6px;
+          cursor: pointer;
+          margin: 5px;
+          transition: background 0.2s ease;
+        }
+
+        .camera-btn:hover, .capture-btn:hover, .upload-btn:hover {
+          background: #2563eb;
+        }
+
+        .stop-camera-btn {
+          background: #ef4444;
+        }
+
+        .stop-camera-btn:hover {
+          background: #dc2626;
+        }
+
+        .camera-controls {
+          display: flex;
+          justify-content: center;
+          gap: 10px;
+          margin-top: 10px;
+        }
+
+        .sticker-controls {
+          border-top: 1px solid #e5e7eb;
+          padding-top: 15px;
+          margin-top: 20px;
+        }
+
+        .control-group {
+          margin-bottom: 15px;
+        }
+
+        .control-group label {
+          display: block;
+          margin-bottom: 5px;
+          font-size: 0.9rem;
+          color: #4a5568;
+        }
+
+        .control-group input[type="range"] {
+          width: 100%;
+        }
+      `}</style>
     </div>
   );
 };

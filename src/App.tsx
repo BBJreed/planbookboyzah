@@ -117,82 +117,67 @@ const App: React.FC = () => {
         </header>
         
         <main className="app-main">
-          {/* Book Container with Binding */}
-          <div className="planner-book">
-            <div className="book-binding">
-              <div className="binding-rings">
-                <div className="ring"></div>
-                <div className="ring"></div>
-                <div className="ring"></div>
-                <div className="ring"></div>
-                <div className="ring"></div>
-                <div className="ring"></div>
-              </div>
-            </div>
-            
-            {/* Left Page */}
-            <div className="page left-page">
-              <div className="page-content">
-                {/* Left side of calendar header */}
-                <div className="page-header-left">
-                  <h2>
-                    {selectedDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
-                  </h2>
-                  <small className="column-info">Sun - Wed</small>
+          {/* Book Container with Proper Layout */}
+          <div className="calendar-container">
+            <h2>📅 Artful Agenda Calendar</h2>
+            <div className="book">
+              <div className="left-page">
+                <div className="page-title">November 2025 - Events</div>
+                <div className="calendar-grid">
+                  <div className="week-header">
+                    <span>S</span><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span>
+                  </div>
+                  <div className="days">
+                    <CalendarCanvas
+                      width={400}
+                      height={300}
+                      pagePosition="left"
+                    />
+                  </div>
                 </div>
                 
-                {/* Left half of calendar */}
-                <div className="calendar-half calendar-left">
-                  <CalendarCanvas
-                    width={window.innerWidth * 0.35}
-                    height={window.innerHeight * 0.55}
-                    pagePosition="left"
-                  />
-                </div>
-                
-                {/* Notes section */}
-                <div className="notes-section">
-                  <h3>Notes</h3>
-                  <div className="ruled-lines">
-                    {Array.from({ length: 3 }, (_, i) => (
-                      <div key={i} className="ruled-line"></div>
-                    ))}
+                {/* Events list section */}
+                <div className="events-section">
+                  <h3>Today's Events</h3>
+                  <div className="event-list">
+                    <div className="event-item">📅 Meeting at 2 PM</div>
+                    <div className="event-item">🍕 Lunch at 12 PM</div>
+                    <div className="event-item">💪 Gym at 6 PM</div>
                   </div>
                 </div>
               </div>
-            </div>
-            
-            {/* Right Page */}
-            <div className="page right-page">
-              <div className="page-content">
-                {/* Right side of calendar header */}
-                <div className="page-header-right">
-                  <small className="column-info">Thu - Sat</small>
+              
+              <div className="right-page">
+                <div className="page-title">November 2025</div>
+                <div className="calendar-grid">
+                  <div className="week-header">
+                    <span>S</span><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span>
+                  </div>
+                  <div className="days">
+                    <CalendarCanvas
+                      width={400}
+                      height={300}
+                      pagePosition="right"
+                    />
+                  </div>
+                </div>
+                
+                {/* Stickers and tools section */}
+                <div className="tools-section">
                   <button 
                     className="sticker-btn"
                     onClick={() => setShowStickerToolbar(true)}
                     title="Add Stickers & Photos"
                   >
-                    🎨
+                    🎨 Stickers
                   </button>
-                </div>
-                
-                {/* Right half of calendar */}
-                <div className="calendar-half calendar-right">
-                  <CalendarCanvas
-                    width={window.innerWidth * 0.35}
-                    height={window.innerHeight * 0.55}
-                    pagePosition="right"
-                  />
-                </div>
-                
-                {/* Tasks section */}
-                <div className="tasks-section">
-                  <h3>Today's Tasks</h3>
-                  <div className="task-lines">
-                    {Array.from({ length: 3 }, (_, i) => (
-                      <div key={i} className="task-line"></div>
-                    ))}
+                  <div className="quick-notes">
+                    <h4>Quick Notes</h4>
+                    <div className="ruled-lines">
+                      {Array.from({ length: 2 }, (_, i) => (
+                        <div key={i} className="ruled-line"></div>
+                      ))}
+                    </div>
                   </div>
                 </div>
               </div>
