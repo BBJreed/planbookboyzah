@@ -8,6 +8,7 @@ import { ErrorBoundary } from './components/ErrorBoundary';
 import { useOnlineStatus } from './hooks/useOnlineStatus';
 import { usePullToRefresh } from './hooks/usePullToRefresh';
 import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts';
+// Updated Nov 21, 2025 with proper calendar grid
 import { useMobileDetection } from './hooks/useMobileDetection';
 import MobileApp from './components/MobileApp';
 
