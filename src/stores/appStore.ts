@@ -5,10 +5,16 @@ interface AppState extends LayerState {
   currentTheme: VisualTheme | null;
   selectedDate: Date;
   zoomLevel: number;
-  viewMode: 'monthly' | 'weekly';
+  viewMode: 'monthly' | 'weekly' | 'daily';
   syncQueue: SyncOperation[];
   history: LayerState[];
   historyIndex: number;
+  
+  // Customization state
+  cover: string;
+  font: string;
+  color: string;
+  stickers: string[]; // Base64 URLs
   
   // Event layer operations
   addEvent: (event: CalendarEvent) => void;
@@ -70,12 +76,18 @@ export const useStore = create<AppState>((set, get) => ({
     tasks: true,
   },
   currentTheme: null,
-  selectedDate: new Date(),
+  selectedDate: new Date(2025, 10, 21), // Nov 21, 2025
   zoomLevel: 1.0,
   viewMode: 'monthly',
   syncQueue: [],
   history: [],
   historyIndex: -1,
+  
+  // Customization state
+  cover: 'brown-leather',
+  font: 'sans-serif',
+  color: '#000000',
+  stickers: [],
   
   // Event layer operations
   addEvent: (event) => {
@@ -229,6 +241,12 @@ export const useStore = create<AppState>((set, get) => ({
   setSelectedDate: (date) => set({ selectedDate: date }),
   setZoomLevel: (level) => set({ zoomLevel: Math.max(0.5, Math.min(3.0, level)) }),
   setViewMode: (mode) => set({ viewMode: mode }),
+  
+  // Customization controls
+  setCover: (cover: string) => set({ cover }),
+  setFont: (font: string) => set({ font }),
+  setColor: (color: string) => set({ color }),
+  addSticker: (sticker: string) => set((state) => ({ stickers: [...state.stickers, sticker] })),
   
   // History controls
   undo: () => {

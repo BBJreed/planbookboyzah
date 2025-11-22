@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useStore } from './stores/appStore';
-import { CalendarCanvas } from './components/CalendarCanvas';
+import CalendarCanvas from './components/CalendarCanvas';
 import { StickerToolbar } from './components/EnhancedStickerToolbar';
 import { SearchBar } from './components/SearchBar';
 import { DatePicker } from './components/DatePicker';
@@ -8,9 +8,10 @@ import { ErrorBoundary } from './components/ErrorBoundary';
 import { useOnlineStatus } from './hooks/useOnlineStatus';
 import { usePullToRefresh } from './hooks/usePullToRefresh';
 import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts';
-// Updated Nov 21, 2025 with proper calendar grid
 import { useMobileDetection } from './hooks/useMobileDetection';
 import MobileApp from './components/MobileApp';
+import Controls from './components/Controls';
+import Stickers from './components/Stickers';
 
 const App: React.FC = () => {
   const { 
@@ -121,37 +122,23 @@ const App: React.FC = () => {
           {/* Book Calendar Container */}
           <div className="calendar-container">
             <h2>📅 Calendar</h2>
+            <Controls />
+            <Stickers />
             <div className="book" id="book">
               <div className="left-page" id="left-page">
-                <h3>Events & Tasks</h3>
-                <ul id="events-list">
-                  <li>📅 Meeting at 2:00 PM</li>
-                  <li>🍕 Lunch with team at 12:30 PM</li>
-                  <li>💪 Gym workout at 6:00 PM</li>
-                  <li>📚 Study session at 8:00 PM</li>
-                </ul>
-                
-                <div className="quick-add">
-                  <h4>Quick Add</h4>
-                  <button 
-                    className="sticker-btn"
-                    onClick={() => setShowStickerToolbar(true)}
-                    title="Add Stickers & Photos"
-                  >
-                    🎨 Add Stickers
-                  </button>
-                </div>
+                <CalendarCanvas
+                  width={400}
+                  height={600}
+                  pagePosition="left"
+                />
               </div>
               
               <div className="right-page" id="right-page">
-                <h3 id="month-title">November 2025</h3>
-                <div className="calendar-grid" id="monthly-grid">
-                  <CalendarCanvas
-                    width={400}
-                    height={350}
-                  />
-                </div>
-                <p>Your personalized calendar experience</p>
+                <CalendarCanvas
+                  width={400}
+                  height={600}
+                  pagePosition="right"
+                />
               </div>
             </div>
           </div>

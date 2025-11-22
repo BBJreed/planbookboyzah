@@ -107,4 +107,4 @@ export interface SyncOperation {
 // Add the missing types
 export type Sticker = DecorativeElement;
 
-export type ViewMode = 'monthly' | 'weekly';
+export type ViewMode = 'monthly' | 'weekly' | 'daily';
